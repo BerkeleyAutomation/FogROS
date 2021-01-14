@@ -1,0 +1,27 @@
+<launch>
+  <node name="listener_node" pkg="beginner_tutorials" type="listener.py" output="screen"/>
+  <node name="talker_node" pkg="beginner_tutorials" type="talker.py" output="screen"/>
+  <node pkg="rosduct" name="rosduct" type="rosduct_main.py" output="screen">
+    <rosparam>
+    # ROSbridge websocket server info
+    rosbridge_ip: 127.0.0.1#54.183.107.136
+    rosbridge_port: 9090
+    # Topics being published in the robot to expose locally
+    remote_topics: [
+                        ['/chatter', 'std_msgs/String']
+                        ]
+    # Topics being published in the local roscore to expose remotely
+    local_topics: [
+    ['/chatter', 'std_msgs/String']
+    ]
+    # Services running in the robot to expose locally
+    remote_services: []
+    # Services running locally to expose to the robot
+    local_services: []
+    # Parameters to be sync, they will be polled to stay in sync
+    #parameters: []
+    #parameter_polling_hz: 1
+
+    </rosparam>
+  </node>
+</launch>

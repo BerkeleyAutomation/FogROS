@@ -1,0 +1,8 @@
+<launch>
+  <node pkg="roscloud" name="roscloud_node" type="roscloud_main.py" output="screen">
+    <rosparam>
+    instance_image: TODO
+    instance_nodes: ["./to_cloud.launch"]
+    </rosparam>
+  </node>
+</launch>
