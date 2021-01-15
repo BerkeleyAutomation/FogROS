@@ -71,7 +71,7 @@ if __name__ == '__main__':
         launch_text = f.read()
         launch_file_dir , launch_file_name = os.path.split(launch_file)
 
-    with open(launch_file_dir + TO_CLOUD_LAUNCHFILE_NAME , "w") as f:
+    with open(launch_file_dir + "/" + TO_CLOUD_LAUNCHFILE_NAME , "w") as f:
         f.write(launch_text.replace("ROSBRIDGE_IP_ADDR_REPLACE", MY_IP_ADDR))
         
     # find all the packages
