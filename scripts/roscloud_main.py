@@ -4,28 +4,86 @@ import rospy
 import re
 import shutil
 import rospkg
-
+import boto3
+from botocore.exceptions import ClientError
+import os
 
 def make_zip_file(dir_name, target_path):
-    print(shutil.make_archive(base_dir = dir_name, root_dir = dir_name, format = "zip", base_name = target_path))
+    pwd, package_name = os.path.split(dir_name)
+    return shutil.make_archive(base_dir = package_name, root_dir = pwd, format = "zip", base_name = target_path)
     
 if __name__ == '__main__':
     rospy.init_node('roscloud')
+
+    ec2 = boto3.client('ec2', "us-west-1")
+    # Do a dryrun first to verify permissions
+    instance_id = "i-0830a57e084eb8799"
+    #instance_dict = ec2.describe_instances().get('Reservations')[0]
+    #print(instance_dict)
+    
+    '''
+    ec2 = boto3.resource('ec2')
+    instances = ec2.create_instances(
+    ImageId='ami-f0091d91',
+    MinCount=1,
+    MaxCount=1,
+    InstanceType='t2.micro',
+    KeyName='<KEY-NAME>',
+    SecurityGroups=['<GROUP-NAME>'])
+    instance = instances[0]
+
+    # Wait for the instance to enter the running state
+    instance.wait_until_running()
+
+    # Reload the instance attributes
+    instance.load()
+    print(instance.public_dns_name)
+
+    try:
+        ec2.start_instances(InstanceIds=[instance_id], DryRun=True)
+    except ClientError as e:
+        if 'DryRunOperation' not in str(e):
+            raise
+
+    try:
+        response = ec2.start_instances(InstanceIds=[instance_id], DryRun=False)
+        print(response)
+    except ClientError as e:
+        print(e)
+    '''
+
     launch_file = rospy.get_param('~launch_file', "")
     if not launch_file:
         print("has to have launch file!")
     with open(launch_file) as f:
         launch_text = f.read()
-
+        
     rospack = rospkg.RosPack()
     # find all the packages
     # package need to follow ros naming convention
     # i.e. flat namespace with lower case letters and underscore separators
     packages = set(re.findall(r"pkg=\"[a-z_]*\"" ,launch_text))
+    zip_paths = []
     for package in packages:
         package = package.split("\"")[1]
         print(package)
         pkg_path = rospack.get_path(package)
         print(pkg_path)
-        make_zip_file(pkg_path, "/home/keplerc/catkin_ws/src/roscloud/"+package)
+        zip_paths.append(make_zip_file(pkg_path, "/home/keplerc/catkin_ws/src/roscloud/"+package))
+
+        ec2_resource = boto3.resource('ec2', "us-west-1")
+
+    instance = ec2_resource.Instance(instance_id)
+    public_ip = (instance.public_ip_address)
+    import paramiko
+    from scp import SCPClient
+    private_key = paramiko.RSAKey.from_private_key_file("/home/keplerc/Downloads/ros-ec2.pem")
+    ssh_client = paramiko.SSHClient()
+    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh_client.connect(hostname = public_ip, username = "ubuntu", pkey = private_key )
+    with SCPClient(ssh_client.get_transport()) as scp:
+        for zip_file in zip_paths:
+            scp.put(zip_file, '~/catkin_ws/src')
+        scp.put(launch_file, '~/catkin_ws/')
+    
     
