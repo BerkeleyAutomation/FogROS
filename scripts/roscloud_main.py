@@ -13,10 +13,11 @@ from scp import SCPClient
 # This machine's IP address
 # It is used to locate RosBridge server 
 MY_IP_ADDR = "3.101.26.208"
-TO_CLOUD_LAUNCHFILE_NAME = "to_cloud.launch"
-
 # private key path for the EC2 instance
 PRIV_KEY_PATH = "/home/ubuntu/a.pem"
+
+# the name of launchfile that needs to be executed by the cloud
+TO_CLOUD_LAUNCHFILE_NAME = "to_cloud.launch"
 # a temperary folder for putting zip files of the packages
 ZIP_FILE_TMP_PATH = "/tmp"
 
@@ -29,12 +30,12 @@ if __name__ == '__main__':
 
     ec2_resource = boto3.resource('ec2', "us-west-1")
     instances = ec2_resource.create_instances(
-        ImageId='ami-05829bd3e68bcd415',
+        ImageId='ami-05829bd3e68bcd415',   # the image of ec2 instance after running rosduct-baseline.
         MinCount=1,
         MaxCount=1,
         InstanceType='t2.micro',
-        KeyName= 'ros-ec2',
-        SecurityGroupIds= ["sg-01b1f843ee3201d68"]
+        KeyName= 'ros-ec2', # you need to setup the keypair first 
+        SecurityGroupIds= ["sg-01b1f843ee3201d68"] # security group that allows all traffic 
     )
     print(instances)
     instance = instances[0]
