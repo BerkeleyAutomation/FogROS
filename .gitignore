@@ -1,0 +1,9 @@
+
+# built files
+**/target
+
+# emacs
+*~
+
+# mac related
+.DS_Store
