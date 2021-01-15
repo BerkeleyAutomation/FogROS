@@ -21,7 +21,7 @@ To fully understand what's happening, you need to run **rosduct-baseline** tutor
 There are plenty of variables to be set correctly before running the project. 
 
 1. ```launch/roscloud.launch``` has a path to the launchfile that needs to be run on the cloud. It has to be an absolute path. 
-2. AWS related. You need to run ```aws configure`` to configure the AWS API keys. You also need to set up a security group to allow ros traffic(which should be available if you have done step 0). 
+2. AWS related. You need to run ```aws configure``` to configure the AWS API keys. You also need to set up a security group to allow ros traffic(which should be available if you have done step 0). 
 3. ```script/rescloud_main.py``` has several variables such as ```MY_IP_ADDR```, ```PRIV_KEY_PATH```  ; AWS related parameters such as ```SecurityGroupIds``` and ```KeyName```. 
 
 TODO: we need to reduce and centralize the variables needed. 
