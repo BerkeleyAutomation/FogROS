@@ -7,14 +7,21 @@ import rospkg
 import boto3
 from botocore.exceptions import ClientError
 import os
+import paramiko
+from scp import SCPClient
 
-#ROSCLOUD_DIR = "/home/ubuntu/catkin_ws/src/roscloud/" #os.path.dirname(os.path.realpath(__file__))
+# This machine's IP address
+# It is used to locate RosBridge server 
+MY_IP_ADDR = "3.101.26.208"
+TO_CLOUD_LAUNCHFILE_NAME = "to_cloud.launch"
+
+# private key path for the EC2 instance
 PRIV_KEY_PATH = "/home/ubuntu/a.pem"
+# a temperary folder for putting zip files of the packages
 ZIP_FILE_TMP_PATH = "/tmp"
 
 def make_zip_file(dir_name, target_path):
     pwd, package_name = os.path.split(dir_name)
-    print("zipped ", package_name)
     return shutil.make_archive(base_dir = package_name, root_dir = pwd, format = "zip", base_name = target_path)
     
 if __name__ == '__main__':
@@ -62,51 +69,54 @@ if __name__ == '__main__':
         print("has to have launch file!")
     with open(launch_file) as f:
         launch_text = f.read()
-        _ , launch_file_name = os.path.split(launch_file)
+        launch_file_dir , launch_file_name = os.path.split(launch_file)
+
+    with open(launch_file_dir + TO_CLOUD_LAUNCHFILE_NAME , "w") as f:
+        f.write(launch_text.replace("ROSBRIDGE_IP_ADDR_REPLACE", MY_IP_ADDR))
         
-    rospack = rospkg.RosPack()
     # find all the packages
     # package need to follow ros naming convention
     # i.e. flat namespace with lower case letters and underscore separators
+    # then zip all the packages
+    rospack = rospkg.RosPack()
     packages = set(re.findall(r"pkg=\"[a-z_]*\"" ,launch_text))
     packages.add("pkg=\"roscloud\"")
     print(packages)
     zip_paths = []
-    
     for package in packages:
         package = package.split("\"")[1]
-        print(package)
         pkg_path = rospack.get_path(package)
-        print(pkg_path)
         zip_path = make_zip_file(pkg_path, "/tmp/" + package)
-        print(zip_path)
         zip_paths.append(zip_path)
 
 
+    # get public ip address of the EC2 server
     ec2_resource = boto3.resource('ec2', "us-west-1")
     instance = ec2_resource.Instance(instance_id)
-    public_ip = (instance.public_ip_address)
-    print("public ip", public_ip)
-    import paramiko
-    from scp import SCPClient
+    public_ip = instance.public_ip_address
+
+    # start a SSH/SCP session to the EC2 server 
     private_key = paramiko.RSAKey.from_private_key_file(PRIV_KEY_PATH)#"/home/keplerc/Downloads/ros-ec2.pem")
     ssh_client = paramiko.SSHClient()
     ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh_client.connect(hostname = public_ip, username = "ubuntu", pkey = private_key )
+    
     with SCPClient(ssh_client.get_transport()) as scp:
+        # transfer all the zip files to the EC2 server's workspace 
         for zip_file in zip_paths:
             scp.put(zip_file, '~/catkin_ws/src')
-        #print('cd ~/catkin_ws/src && unzip -vo ' + ".zip ".join(package_names) + ".zip")
 
-        # stdin, stdout, stderr = ssh_client.exec_command("cd ~/catkin_ws/src && for i in *.zip; do unzip -o \"$i\" -d \"${i%%.zip}\"; done " , get_pty=True)
+        # use SSH to unzip them 
         stdin, stdout, stderr = ssh_client.exec_command("cd ~/catkin_ws/src && for i in *.zip; do unzip -o \"$i\" -d . ; done " , get_pty=True)
         
         for line in iter(stdout.readline, ""):
             print(line, end="")
 
-        scp.put(launch_file, "~/catkin_ws/src/roscloud/launch/" + launch_file_name)
+        # transfer the launch script 
+        scp.put(launch_file_dir + TO_CLOUD_LAUNCHFILE_NAME, "~/catkin_ws/src/roscloud/launch/" + TO_CLOUD_LAUNCHFILE_NAME)
 
-        stdin, stdout, stderr = ssh_client.exec_command('cd ~/catkin_ws/ && source ./devel/setup.bash && catkin_make && roslaunch roscloud ' + launch_file_name , get_pty=True)
+        # roslaunch the script on EC2 instance 
+        stdin, stdout, stderr = ssh_client.exec_command('cd ~/catkin_ws/ && source ./devel/setup.bash && catkin_make && roslaunch roscloud ' + TO_CLOUD_LAUNCHFILE_NAME , get_pty=True)
 
         for line in iter(stdout.readline, ""):
             print(line, end="")        

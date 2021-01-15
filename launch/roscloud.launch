@@ -3,7 +3,7 @@
     <rosparam>
     instance_image: TODO
     #launch_file: "/home/keplerc/catkin_ws/src/roscloud/launch/to_cloud.launch"
-    launch_file: "/home/ubuntu/catkin_ws/src/roscloud/launch/to_cloud.launch"
+    launch_file: "/home/ubuntu/catkin_ws/src/roscloud/launch/myscript.launch"
     </rosparam>
   </node>
 </launch>
