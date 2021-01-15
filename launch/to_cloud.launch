@@ -4,7 +4,7 @@
   <node pkg="rosduct" name="rosduct" type="rosduct_main.py" output="screen">
     <rosparam>
     # ROSbridge websocket server info
-    rosbridge_ip: 127.0.0.1#54.183.107.136
+    rosbridge_ip: 3.101.26.208
     rosbridge_port: 9090
     # Topics being published in the robot to expose locally
     remote_topics: [

@@ -2,7 +2,8 @@
   <node pkg="roscloud" name="roscloud_node" type="roscloud_main.py" output="screen">
     <rosparam>
     instance_image: TODO
-    launch_file: "/home/keplerc/catkin_ws/src/roscloud/launch/to_cloud.launch"
+    #launch_file: "/home/keplerc/catkin_ws/src/roscloud/launch/to_cloud.launch"
+    launch_file: "/home/ubuntu/catkin_ws/src/roscloud/launch/to_cloud.launch"
     </rosparam>
   </node>
 </launch>

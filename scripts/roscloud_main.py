@@ -1,4 +1,4 @@
-#!/home/keplerc/anaconda3/bin/python
+#!/usr/bin/python
 
 import rospy
 import re
@@ -8,8 +8,13 @@ import boto3
 from botocore.exceptions import ClientError
 import os
 
+#ROSCLOUD_DIR = "/home/ubuntu/catkin_ws/src/roscloud/" #os.path.dirname(os.path.realpath(__file__))
+PRIV_KEY_PATH = "/home/ubuntu/a.pem"
+ZIP_FILE_TMP_PATH = "/tmp"
+
 def make_zip_file(dir_name, target_path):
     pwd, package_name = os.path.split(dir_name)
+    print("zipped ", package_name)
     return shutil.make_archive(base_dir = package_name, root_dir = pwd, format = "zip", base_name = target_path)
     
 if __name__ == '__main__':
@@ -57,6 +62,7 @@ if __name__ == '__main__':
         print("has to have launch file!")
     with open(launch_file) as f:
         launch_text = f.read()
+        _ , launch_file_name = os.path.split(launch_file)
         
     rospack = rospkg.RosPack()
     # find all the packages
@@ -66,22 +72,24 @@ if __name__ == '__main__':
     packages.add("pkg=\"roscloud\"")
     print(packages)
     zip_paths = []
-    package_names= []
     
     for package in packages:
         package = package.split("\"")[1]
         print(package)
         pkg_path = rospack.get_path(package)
         print(pkg_path)
-        zip_paths.append(make_zip_file(pkg_path, "/home/keplerc/catkin_ws/src/roscloud/"+package))
-        package_names.append(package)
-        
+        zip_path = make_zip_file(pkg_path, "/tmp/" + package)
+        print(zip_path)
+        zip_paths.append(zip_path)
+
+
     ec2_resource = boto3.resource('ec2', "us-west-1")
     instance = ec2_resource.Instance(instance_id)
     public_ip = (instance.public_ip_address)
+    print("public ip", public_ip)
     import paramiko
     from scp import SCPClient
-    private_key = paramiko.RSAKey.from_private_key_file("/home/keplerc/Downloads/ros-ec2.pem")
+    private_key = paramiko.RSAKey.from_private_key_file(PRIV_KEY_PATH)#"/home/keplerc/Downloads/ros-ec2.pem")
     ssh_client = paramiko.SSHClient()
     ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh_client.connect(hostname = public_ip, username = "ubuntu", pkey = private_key )
@@ -90,16 +98,15 @@ if __name__ == '__main__':
             scp.put(zip_file, '~/catkin_ws/src')
         #print('cd ~/catkin_ws/src && unzip -vo ' + ".zip ".join(package_names) + ".zip")
 
-        stdin, stdout, stderr = ssh_client.exec_command("cd ~/catkin_ws/src && for i in *.zip; do unzip -o \"$i\" -d \"${i%%.zip}\"; done " , get_pty=True)
-
-        for line in iter(stdout.readline, ""):
-            print(line, end="")
-
-        scp.put(launch_file, "~/catkin_ws/src/roscloud/launch/")
-
-        stdin, stdout, stderr = ssh_client.exec_command('cd ~/catkin_ws/ && source ./devel/setup.bash && catkin_make', get_pty=True )
-
-        for line in iter(stdout.readline, ""):
-            print(line, end="")
-
+        # stdin, stdout, stderr = ssh_client.exec_command("cd ~/catkin_ws/src && for i in *.zip; do unzip -o \"$i\" -d \"${i%%.zip}\"; done " , get_pty=True)
+        stdin, stdout, stderr = ssh_client.exec_command("cd ~/catkin_ws/src && for i in *.zip; do unzip -o \"$i\" -d . ; done " , get_pty=True)
         
+        for line in iter(stdout.readline, ""):
+            print(line, end="")
+
+        scp.put(launch_file, "~/catkin_ws/src/roscloud/launch/" + launch_file_name)
+
+        stdin, stdout, stderr = ssh_client.exec_command('cd ~/catkin_ws/ && source ./devel/setup.bash && catkin_make && roslaunch roscloud ' + launch_file_name , get_pty=True)
+
+        for line in iter(stdout.readline, ""):
+            print(line, end="")        
