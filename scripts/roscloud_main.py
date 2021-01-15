@@ -63,16 +63,20 @@ if __name__ == '__main__':
     # package need to follow ros naming convention
     # i.e. flat namespace with lower case letters and underscore separators
     packages = set(re.findall(r"pkg=\"[a-z_]*\"" ,launch_text))
+    packages.add("pkg=\"roscloud\"")
+    print(packages)
     zip_paths = []
+    package_names= []
+    
     for package in packages:
         package = package.split("\"")[1]
         print(package)
         pkg_path = rospack.get_path(package)
         print(pkg_path)
         zip_paths.append(make_zip_file(pkg_path, "/home/keplerc/catkin_ws/src/roscloud/"+package))
-
-        ec2_resource = boto3.resource('ec2', "us-west-1")
-
+        package_names.append(package)
+        
+    ec2_resource = boto3.resource('ec2', "us-west-1")
     instance = ec2_resource.Instance(instance_id)
     public_ip = (instance.public_ip_address)
     import paramiko
@@ -84,6 +88,18 @@ if __name__ == '__main__':
     with SCPClient(ssh_client.get_transport()) as scp:
         for zip_file in zip_paths:
             scp.put(zip_file, '~/catkin_ws/src')
-        scp.put(launch_file, '~/catkin_ws/')
-    
-    
+        #print('cd ~/catkin_ws/src && unzip -vo ' + ".zip ".join(package_names) + ".zip")
+
+        stdin, stdout, stderr = ssh_client.exec_command("cd ~/catkin_ws/src && for i in *.zip; do unzip -o \"$i\" -d \"${i%%.zip}\"; done " , get_pty=True)
+
+        for line in iter(stdout.readline, ""):
+            print(line, end="")
+
+        scp.put(launch_file, "~/catkin_ws/src/roscloud/launch/")
+
+        stdin, stdout, stderr = ssh_client.exec_command('cd ~/catkin_ws/ && source ./devel/setup.bash && catkin_make', get_pty=True )
+
+        for line in iter(stdout.readline, ""):
+            print(line, end="")
+
+        
