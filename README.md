@@ -12,7 +12,7 @@ RosCloud enables ROS application developers to easily offload their ROS applicat
 
 #### Step 0: run rosduct-baseline 
 
-To fully understand what's happening, you need to run **rosduct-baseline** tutorial successfully. Or you can start an EC2 instance with image ```ami-05829bd3e68bcd415```  and do the following steps from there. 
+To fully understand what's happening, you need to run or at least play with **rosduct-baseline** tutorial. You can start an EC2 instance with image ```ami-05829bd3e68bcd415```  and start from there. 
 
 
 
@@ -37,7 +37,7 @@ roslaunch rosbridge_server rosbridge_websocket.launch
 
 
 
-Then  run 
+Then run 
 
 ````
 roslaunch roscloud roscloud.launch 
