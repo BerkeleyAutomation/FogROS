@@ -5,7 +5,7 @@
     <rosparam>
     # ROSbridge websocket server info
     # you may fill the rosbridge's ip address or use the following placeholder for the client
-    rosbridge_ip: ROSBRIDGE_IP_ADDR_REPLACE 
+    rosbridge_ip: 3.101.26.208 
     rosbridge_port: 9090
     # Topics being published in the robot to expose locally
     remote_topics: [

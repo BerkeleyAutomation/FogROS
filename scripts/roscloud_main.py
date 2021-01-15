@@ -23,27 +23,26 @@ ZIP_FILE_TMP_PATH = "/tmp"
 def make_zip_file(dir_name, target_path):
     pwd, package_name = os.path.split(dir_name)
     return shutil.make_archive(base_dir = package_name, root_dir = pwd, format = "zip", base_name = target_path)
-    
+
 if __name__ == '__main__':
     rospy.init_node('roscloud')
 
-    ec2 = boto3.client('ec2', "us-west-1")
-    # Do a dryrun first to verify permissions
-    instance_id = "i-0830a57e084eb8799"
+    ec2_resource = boto3.resource('ec2', "us-west-1")
+    instances = ec2_resource.create_instances(
+        ImageId='ami-05829bd3e68bcd415',
+        MinCount=1,
+        MaxCount=1,
+        InstanceType='t2.micro',
+        KeyName= 'ros-ec2',
+        SecurityGroupIds= ["sg-01b1f843ee3201d68"]
+    )
+    print(instances)
+    instance = instances[0]
+
     #instance_dict = ec2.describe_instances().get('Reservations')[0]
     #print(instance_dict)
     
     '''
-    ec2 = boto3.resource('ec2')
-    instances = ec2.create_instances(
-    ImageId='ami-f0091d91',
-    MinCount=1,
-    MaxCount=1,
-    InstanceType='t2.micro',
-    KeyName='<KEY-NAME>',
-    SecurityGroups=['<GROUP-NAME>'])
-    instance = instances[0]
-
     # Wait for the instance to enter the running state
     instance.wait_until_running()
 
@@ -51,6 +50,7 @@ if __name__ == '__main__':
     instance.load()
     print(instance.public_dns_name)
 
+    ec2 = boto3.client('ec2', "us-west-1")
     try:
         ec2.start_instances(InstanceIds=[instance_id], DryRun=True)
     except ClientError as e:
@@ -91,8 +91,9 @@ if __name__ == '__main__':
 
 
     # get public ip address of the EC2 server
-    ec2_resource = boto3.resource('ec2', "us-west-1")
-    instance = ec2_resource.Instance(instance_id)
+
+    #instance_id = "i-0830a57e084eb8799"
+    #instance = ec2_resource.Instance(instance_id)
     public_ip = instance.public_ip_address
 
     # start a SSH/SCP session to the EC2 server 
