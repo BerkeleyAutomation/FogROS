@@ -4,18 +4,26 @@
 
     launch_file: "/home/ubuntu/catkin_ws/src/roscloud/launch/myscript.launch"
     private_key_path: "/home/ubuntu/a.pem"
-    
+
+    # EC2 related paramters 
     ec2_instance_image: ami-05829bd3e68bcd415
     ec2_instance_type: t2.micro
+    # NOTE: the following paramter must changed based on
+    # your AWS account settings
+    # the name of an existing AWS keypair
     ec2_key_name: ros-ec2
-    ec2_security_group_id: sg-01b1f843ee3201d68
-
+    # security group that allows traffic to your host machine
+    ec2_security_group_ids: ['sg-01b1f843ee3201d68']
+    
     # This machine's IP address                                                     
     # It is used to locate RosBridge server
     rosbridge_ip_addr: "3.101.26.208"
 
     # optional parameters
+    # a temperary folder for putting zip files of the packages
     temporary_dir: "/tmp"
+    # to avoid name conflict, the name of launch file that
+    # you want to store in the cloud
     to_cloud_launchfile_name : "to_cloud.launch"
     
     </rosparam>

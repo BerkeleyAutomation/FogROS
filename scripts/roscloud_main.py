@@ -10,15 +10,9 @@ import os
 import paramiko
 from scp import SCPClient
 
-# This machine's IP address
-# It is used to locate RosBridge server 
-MY_IP_ADDR = "3.101.26.208"
-TO_CLOUD_LAUNCHFILE_NAME = "to_cloud.launch"
 
 # private key path for the EC2 instance
 PRIV_KEY_PATH = "/home/ubuntu/a.pem"
-# a temperary folder for putting zip files of the packages
-ZIP_FILE_TMP_PATH = "/tmp"
 
 def make_zip_file(dir_name, target_path):
     pwd, package_name = os.path.split(dir_name)
@@ -26,24 +20,30 @@ def make_zip_file(dir_name, target_path):
 
 if __name__ == '__main__':
     rospy.init_node('roscloud')
-    TO_CLOUD_LAUNCHFILE_NAME = rospy.get_param('~to_cloud_launchfile_name', "")
-    MY_IP_ADDR = rospy.get_param('~rosbridge_ip_addr', "")
-    PRIV_KEY_PATH = rospy.get_param('~private_key_path', "")
-    ZIP_FILE_TMP_PATH = rospy.get_param('~temporary_dir', "")
+    TO_CLOUD_LAUNCHFILE_NAME = rospy.get_param('~to_cloud_launchfile_name', "to_cloud.launch")
+    MY_IP_ADDR = rospy.get_param('~rosbridge_ip_addr')
+    PRIV_KEY_PATH = rospy.get_param('~private_key_path')
+    ZIP_FILE_TMP_PATH = rospy.get_param('~temporary_dir', "/tmp")
     
+    image_id = rospy.get_param('~ec2_instance_image', 'ami-05829bd3e68bcd415')
+    ec2_instance_type = rospy.get_param('~ec2_instance_type', 't2.micro')
+    # name of existing key pair
+    # TODO: get a new one if this paramter is not there
+    ec2_key_name = ros.get_param('~ec2_key_name')
+    ec2_security_group_ids = ros.get_param('~ec2_security_group_ids', [])
     
     exit()
     
     ec2_resource = boto3.resource('ec2', "us-west-1")
     instances = ec2_resource.create_instances(
-        ImageId='ami-05829bd3e68bcd415',
+        ImageId=image_id,
         MinCount=1,
         MaxCount=1,
-        InstanceType='t2.micro',
-        KeyName= 'ros-ec2',
-        SecurityGroupIds= ["sg-01b1f843ee3201d68"]
+        InstanceType=ec2_instance_type,
+        KeyName= ec2_key_name,
+        SecurityGroupIds= ec2_security_group_ids
     )
-    print(instances)
+    print("Have created the instance: ", instances)
     instance = instances[0]
 
     #instance_dict = ec2.describe_instances().get('Reservations')[0]
@@ -71,9 +71,8 @@ if __name__ == '__main__':
         print(e)
     '''
 
-    launch_file = rospy.get_param('~launch_file', "")
-    if not launch_file:
-        print("has to have launch file!")
+    launch_file = rospy.get_param('~launch_file')
+    
     with open(launch_file) as f:
         launch_text = f.read()
         launch_file_dir , launch_file_name = os.path.split(launch_file)
