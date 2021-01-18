@@ -26,7 +26,14 @@ def make_zip_file(dir_name, target_path):
 
 if __name__ == '__main__':
     rospy.init_node('roscloud')
-
+    TO_CLOUD_LAUNCHFILE_NAME = rospy.get_param('~to_cloud_launchfile_name', "")
+    MY_IP_ADDR = rospy.get_param('~rosbridge_ip_addr', "")
+    PRIV_KEY_PATH = rospy.get_param('~private_key_path', "")
+    ZIP_FILE_TMP_PATH = rospy.get_param('~temporary_dir', "")
+    
+    
+    exit()
+    
     ec2_resource = boto3.resource('ec2', "us-west-1")
     instances = ec2_resource.create_instances(
         ImageId='ami-05829bd3e68bcd415',

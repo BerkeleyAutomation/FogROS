@@ -1,9 +1,23 @@
 <launch>
   <node pkg="roscloud" name="roscloud_node" type="roscloud_main.py" output="screen">
     <rosparam>
-    instance_image: TODO
-    #launch_file: "/home/keplerc/catkin_ws/src/roscloud/launch/to_cloud.launch"
+
     launch_file: "/home/ubuntu/catkin_ws/src/roscloud/launch/myscript.launch"
+    private_key_path: "/home/ubuntu/a.pem"
+    
+    ec2_instance_image: ami-05829bd3e68bcd415
+    ec2_instance_type: t2.micro
+    ec2_key_name: ros-ec2
+    ec2_security_group_id: sg-01b1f843ee3201d68
+
+    # This machine's IP address                                                     
+    # It is used to locate RosBridge server
+    rosbridge_ip_addr: "3.101.26.208"
+
+    # optional parameters
+    temporary_dir: "/tmp"
+    to_cloud_launchfile_name : "to_cloud.launch"
+    
     </rosparam>
   </node>
 </launch>
