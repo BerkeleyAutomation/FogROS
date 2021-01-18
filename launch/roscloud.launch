@@ -2,7 +2,9 @@
   <node pkg="roscloud" name="roscloud_node" type="roscloud_main.py" output="screen">
     <rosparam>
 
+    # the launchfile that you hope to run on remote server
     launch_file: "/home/ubuntu/catkin_ws/src/roscloud/launch/myscript.launch"
+    # the private key path to the key in ec2_key_name
     private_key_path: "/home/ubuntu/a.pem"
 
     # EC2 related paramters 

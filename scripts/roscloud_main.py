@@ -11,9 +11,6 @@ import paramiko
 from scp import SCPClient
 
 
-# private key path for the EC2 instance
-PRIV_KEY_PATH = "/home/ubuntu/a.pem"
-
 def make_zip_file(dir_name, target_path):
     pwd, package_name = os.path.split(dir_name)
     return shutil.make_archive(base_dir = package_name, root_dir = pwd, format = "zip", base_name = target_path)
