@@ -15,29 +15,17 @@ RosCloud enables ROS application developers to easily offload their ROS applicat
 To fully understand what's happening, you need to run or at least play with **rosduct-baseline** tutorial. You can start an EC2 instance with image ```ami-05829bd3e68bcd415```  and start from there. 
 
 
-
 #### Step 1:  Set up the repo's environments
 
-There are plenty of variables to be set correctly before running the project. 
+```launch/roscloud.launch``` has plenty of variables to be set correctly before running the project. 
 
-1. ```launch/roscloud.launch``` has a path to the launchfile that needs to be run on the cloud. It has to be an absolute path. 
-2. AWS related. You need to run ```aws configure``` to configure the AWS API keys. You also need to set up a security group to allow ros traffic(which should be available if you have done step 0). 
-3. ```script/rescloud_main.py``` has several variables such as ```MY_IP_ADDR```, ```PRIV_KEY_PATH```  ; AWS related parameters such as ```SecurityGroupIds``` and ```KeyName```. 
-
-TODO: we need to reduce and centralize the variables needed. 
+1. It has a ```launch_file``` which is the path to the launchfile that needs to be run on the cloud. It has to be an absolute path. 
+2. AWS related. Before changing the launch file, you need to run ```aws configure``` to configure the AWS API keys. You also need to generate AWS key pair and set up a security group to allow the traffic to your host machine(these should be available after you have done step 0). 
+3. It also has other variables such as rosbridge's IP address and the path of EC2 private key(used to set up the EC2 instance)
 
 
 #### Step2: Run it 
-
-First run rosbridge server by 
-
-```
-roslaunch rosbridge_server rosbridge_websocket.launch
-```
-
-
-
-Then run 
+Simply run 
 
 ````
 roslaunch roscloud roscloud.launch 
@@ -48,6 +36,6 @@ The EC2 instance will be automatically created, and you will see the console pri
 
 ### Aside
 
-I am still working on optimizations. If any of the code doesn't work, first checkout commit 272a60f. (which I will tag it to make it easier to find)
+I am still working on code optimizations, so the current commit is NOT TESTED. If any of the code doesn't work, first checkout commit 272a60f. (which I have tagged that commit to make it easier to find)
 
 
