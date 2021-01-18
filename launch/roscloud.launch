@@ -1,4 +1,5 @@
 <launch>
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />	
   <node pkg="roscloud" name="roscloud_node" type="roscloud_main.py" output="screen">
     <rosparam>
 
