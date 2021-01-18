@@ -29,8 +29,8 @@ if __name__ == '__main__':
     ec2_instance_type = rospy.get_param('~ec2_instance_type', 't2.micro')
     # name of existing key pair
     # TODO: get a new one if this paramter is not there
-    ec2_key_name = ros.get_param('~ec2_key_name')
-    ec2_security_group_ids = ros.get_param('~ec2_security_group_ids', [])
+    ec2_key_name = rospy.get_param('~ec2_key_name')
+    ec2_security_group_ids = rospy.get_param('~ec2_security_group_ids', [])
     
     exit()
     
