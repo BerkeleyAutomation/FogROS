@@ -45,3 +45,9 @@ roslaunch roscloud roscloud.launch
 
 The EC2 instance will be automatically created, and you will see the console printing "I heared Hello World" sent by the remote EC2 server. 
 
+
+### Aside
+
+I am still working on optimizations. If any of the code doesn't work, first checkout commit 272a60f. (which I will tag it to make it easier to find)
+
+
