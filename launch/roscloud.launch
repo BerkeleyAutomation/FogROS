@@ -7,7 +7,7 @@
     <rosparam>
 
     # the launchfile that you hope to run on remote server
-    launch_file: "/home/ubuntu/catkin_ws/src/roscloud/launch/myscript.launch"
+    launch_file: "/home/ubuntu/catkin_ws/src/roscloud/launch/example.launch"
     # the private key path to the key in ec2_key_name
     private_key_path: "/home/ubuntu/a.pem"
 

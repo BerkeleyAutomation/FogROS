@@ -1,6 +1,6 @@
 <launch>
-  <node name="listener_node" pkg="beginner_tutorials" type="listener.py" output="screen"/>
-  #<node name="talker_node" pkg="beginner_tutorials" type="talker.py" output="screen"/>
+  # <node name="listener_node" pkg="beginner_tutorials" type="listener.py" output="screen"/>
+  <node name="talker_node" pkg="beginner_tutorials" type="talker.py" output="screen"/>
   <node pkg="rosduct" name="rosduct" type="rosduct_main.py" output="screen">
     <rosparam>
     # ROSbridge websocket server info
