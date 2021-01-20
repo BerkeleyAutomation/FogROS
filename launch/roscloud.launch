@@ -23,7 +23,7 @@
     
     # This machine's IP address                                                     
     # It is used to locate RosBridge server
-    rosbridge_ip_addr: "3.101.26.208"
+    rosbridge_ip_addr: 54.176.16.188
 
     # optional parameters
     # a temperary folder for putting zip files of the packages

@@ -29,8 +29,6 @@ if __name__ == '__main__':
     ec2_key_name = rospy.get_param('~ec2_key_name')
     ec2_security_group_ids = rospy.get_param('~ec2_security_group_ids', [])
     
-    exit()
-    
     ec2_resource = boto3.resource('ec2', "us-west-1")
     instances = ec2_resource.create_instances(
         ImageId=image_id,
@@ -116,8 +114,9 @@ if __name__ == '__main__':
         for line in iter(stdout.readline, ""):
             print(line, end="")
 
-        # transfer the launch script 
-        scp.put(launch_file_dir + TO_CLOUD_LAUNCHFILE_NAME, "~/catkin_ws/src/roscloud/launch/" + TO_CLOUD_LAUNCHFILE_NAME)
+        # transfer the launch script
+        # TODO: change it into tmp
+        scp.put(launch_file_dir + "/" + TO_CLOUD_LAUNCHFILE_NAME, "~/catkin_ws/src/roscloud/launch/" + TO_CLOUD_LAUNCHFILE_NAME)
 
         # roslaunch the script on EC2 instance 
         stdin, stdout, stderr = ssh_client.exec_command('cd ~/catkin_ws/ && source ./devel/setup.bash && catkin_make && roslaunch roscloud ' + TO_CLOUD_LAUNCHFILE_NAME , get_pty=True)
