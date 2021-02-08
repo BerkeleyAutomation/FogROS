@@ -17,7 +17,7 @@
     # the name of an existing AWS keypair
     ec2_key_name: ros-ec2
     # security group that allows traffic to your host machine
-    ec2_security_group_ids: ['sg-01b1f843ee3201d68']
+    ec2_security_group_ids: [] #leave empty, the system will create one for you
     
     # optional parameters
     # a temperary folder for putting zip files of the packages
