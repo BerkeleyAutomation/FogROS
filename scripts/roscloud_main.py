@@ -32,13 +32,14 @@ if __name__ == '__main__':
     ec2_key_name = rospy.get_param('~ec2_key_name')
     ec2_security_group_ids = rospy.get_param('~ec2_security_group_ids', [])
 
-    ec2_key_name = "foo5"
-    ec2_key_client = boto3.client('ec2', "us-west-1")
-    ec2_keypair = ec2_key_client.create_key_pair(KeyName=ec2_key_name) 
-    ec2_priv_key = ec2_keypair['KeyMaterial']
-    with open("/home/ubuntu/" + ec2_key_name + ".pem", "w") as f:
-        f.write(ec2_priv_key)
-    print(ec2_priv_key)
+    ec2_key_name = "foo6"
+    #ec2_key_client = boto3.client('ec2', "us-west-1")
+    #ec2_keypair = ec2_key_client.create_key_pair(KeyName=ec2_key_name) 
+    #ec2_priv_key = ec2_keypair['KeyMaterial']
+    #ec2_keypair.save("/home/ubuntu/")
+    #with open("/home/ubuntu/" + ec2_key_name + ".pem", "w") as f:
+    #    f.write(ec2_priv_key)
+    #print(ec2_priv_key)
     
     #
     # start EC2 instance
@@ -55,7 +56,10 @@ if __name__ == '__main__':
     )
     print("Have created the instance: ", instances)
     instance = instances[0]
-
+    # use the boto3 waiter
+    instance.wait_until_running()
+    # reload instance object
+    instance.reload()
     #instance_dict = ec2.describe_instances().get('Reservations')[0]
     #print(instance_dict)
     
@@ -93,20 +97,26 @@ if __name__ == '__main__':
     # get public ip address of the EC2 server
     #instance_id = "i-0830a57e084eb8799"
     #instance = ec2_resource.Instance(instance_id)
+    import time
+    
     public_ip = instance.public_ip_address
-
+    while not public_ip:
+        instance.reload()
+        public_ip = instance.public_ip_address
+        print(public_ip)
 
     #keyfile = StringIO()
     #keyfile.write(ec2_priv_key)
     #keyfile.seek(0)
     # start a SSH/SCP session to the EC2 server 
     #private_key = paramiko.RSAKey.from_private_key(keyfile) ./priv_key.pem
+    time.sleep(20)
     private_key = paramiko.RSAKey.from_private_key_file("/home/ubuntu/" + ec2_key_name + ".pem")
     print(private_key)
     ssh_client = paramiko.SSHClient()
     ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh_client.connect(hostname = public_ip, username = "ubuntu", pkey = private_key )
-    
+    ssh_client.connect(hostname = public_ip, username = "ubuntu", pkey = private_key, look_for_keys=False )
+
     with SCPClient(ssh_client.get_transport()) as scp:
         # transfer all the zip files to the EC2 server's workspace 
         for zip_file in zip_paths:

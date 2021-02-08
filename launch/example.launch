@@ -17,11 +17,11 @@
     ]
     # Services running in the robot to expose locally
     remote_services: [
-     ['/add_two_ints', 'beginner_tutorials/AddTwoInts']
+     ['/add_two_ints', 'roscloud/AddTwoInts']
     ]
     # Services running locally to expose to the robot
     local_services: [
-     ['/add_two_ints', 'beginner_tutorials/AddTwoInts']
+     ['/add_two_ints', 'roscloud/AddTwoInts']
     ]
     # Parameters to be sync, they will be polled to stay in sync
     #parameters: []
