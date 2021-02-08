@@ -51,27 +51,6 @@ if __name__ == '__main__':
     #instance_dict = ec2.describe_instances().get('Reservations')[0]
     #print(instance_dict)
     
-    '''
-    # Wait for the instance to enter the running state
-    instance.wait_until_running()
-
-    # Reload the instance attributes
-    instance.load()
-    print(instance.public_dns_name)
-
-    ec2 = boto3.client('ec2', "us-west-1")
-    try:
-        ec2.start_instances(InstanceIds=[instance_id], DryRun=True)
-    except ClientError as e:
-        if 'DryRunOperation' not in str(e):
-            raise
-
-    try:
-        response = ec2.start_instances(InstanceIds=[instance_id], DryRun=False)
-        print(response)
-    except ClientError as e:
-        print(e)
-    '''
 
     # 
     # read in the launchfile 
@@ -119,6 +98,10 @@ if __name__ == '__main__':
         for zip_file in zip_paths:
             scp.put(zip_file, '~/catkin_ws/src')
 
+        # use SCP to upload the launch script
+        scp.put(launch_file_dir + "/" + TO_CLOUD_LAUNCHFILE_NAME, "~/catkin_ws/src/roscloud/launch/" + TO_CLOUD_LAUNCHFILE_NAME)
+
+            
         # use SSH to unzip them to the catkin workspace
         stdin, stdout, stderr = ssh_client.exec_command("cd ~/catkin_ws/src && for i in *.zip; do unzip -o \"$i\" -d . ; done " , get_pty=True)
 
@@ -127,8 +110,6 @@ if __name__ == '__main__':
         for line in iter(stdout.readline, ""):
             print(CRED + line + CEND, end="")
 
-        # use SSH to upload the launch script
-        scp.put(launch_file_dir + "/" + TO_CLOUD_LAUNCHFILE_NAME, "~/catkin_ws/src/roscloud/launch/" + TO_CLOUD_LAUNCHFILE_NAME)
 
         # catkin_make all the uploaded packages
         # roslaunch the script on EC2  
