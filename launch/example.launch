@@ -1,5 +1,6 @@
 <launch>
-  <node name="talker_node" pkg="beginner_tutorials" type="talker.py" output="screen"/>
+  <node name="talker_node" pkg="roscloud" type="talker.py" output="screen"/>
+  <node name="add_two_int_node" pkg="roscloud" type="add_two_ints_server.py" output="screen"/>	
   <node pkg="rosduct" name="rosduct" type="rosduct_main.py" output="screen">
     <rosparam>
     # ROSbridge websocket server info
@@ -15,9 +16,13 @@
     ['/chatter', 'std_msgs/String']
     ]
     # Services running in the robot to expose locally
-    remote_services: []
+    remote_services: [
+     ['/add_two_ints', 'beginner_tutorials/AddTwoInts']
+    ]
     # Services running locally to expose to the robot
-    local_services: []
+    local_services: [
+     ['/add_two_ints', 'beginner_tutorials/AddTwoInts']
+    ]
     # Parameters to be sync, they will be polled to stay in sync
     #parameters: []
     #parameter_polling_hz: 1
