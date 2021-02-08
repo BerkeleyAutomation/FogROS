@@ -9,7 +9,7 @@ from botocore.exceptions import ClientError
 import os
 import paramiko
 from scp import SCPClient
-
+from io import StringIO
 
 def make_zip_file(dir_name, target_path):
     pwd, package_name = os.path.split(dir_name)
@@ -31,6 +31,14 @@ if __name__ == '__main__':
     # TODO: get a new one if this paramter is not there
     ec2_key_name = rospy.get_param('~ec2_key_name')
     ec2_security_group_ids = rospy.get_param('~ec2_security_group_ids', [])
+
+    ec2_key_name = "foo5"
+    ec2_key_client = boto3.client('ec2', "us-west-1")
+    ec2_keypair = ec2_key_client.create_key_pair(KeyName=ec2_key_name) 
+    ec2_priv_key = ec2_keypair['KeyMaterial']
+    with open("/home/ubuntu/" + ec2_key_name + ".pem", "w") as f:
+        f.write(ec2_priv_key)
+    print(ec2_priv_key)
     
     #
     # start EC2 instance
@@ -87,8 +95,14 @@ if __name__ == '__main__':
     #instance = ec2_resource.Instance(instance_id)
     public_ip = instance.public_ip_address
 
+
+    #keyfile = StringIO()
+    #keyfile.write(ec2_priv_key)
+    #keyfile.seek(0)
     # start a SSH/SCP session to the EC2 server 
-    private_key = paramiko.RSAKey.from_private_key_file(PRIV_KEY_PATH)#"/home/keplerc/Downloads/ros-ec2.pem")
+    #private_key = paramiko.RSAKey.from_private_key(keyfile) ./priv_key.pem
+    private_key = paramiko.RSAKey.from_private_key_file("/home/ubuntu/" + ec2_key_name + ".pem")
+    print(private_key)
     ssh_client = paramiko.SSHClient()
     ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh_client.connect(hostname = public_ip, username = "ubuntu", pkey = private_key )
