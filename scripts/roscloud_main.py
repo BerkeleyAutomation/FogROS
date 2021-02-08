@@ -10,6 +10,8 @@ import os
 import paramiko
 from scp import SCPClient
 from io import StringIO
+from requests import get
+import time
 
 def make_zip_file(dir_name, target_path):
     pwd, package_name = os.path.split(dir_name)
@@ -22,25 +24,51 @@ if __name__ == '__main__':
     # read in parameters from the launch script
     #
     TO_CLOUD_LAUNCHFILE_NAME = rospy.get_param('~to_cloud_launchfile_name', "to_cloud.launch")
-    MY_IP_ADDR = rospy.get_param('~rosbridge_ip_addr')
-    PRIV_KEY_PATH = rospy.get_param('~private_key_path')
+
+    MY_IP_ADDR = get('https://api.ipify.org').text
+    print("my ip address is ", MY_IP_ADDR)
     ZIP_FILE_TMP_PATH = rospy.get_param('~temporary_dir', "/tmp")
     image_id = rospy.get_param('~ec2_instance_image', 'ami-05829bd3e68bcd415')
     ec2_instance_type = rospy.get_param('~ec2_instance_type', 't2.micro')
     # name of existing key pair
     # TODO: get a new one if this paramter is not there
     ec2_key_name = rospy.get_param('~ec2_key_name')
-    ec2_security_group_ids = rospy.get_param('~ec2_security_group_ids', [])
 
-    ec2_key_name = "foo6"
-    #ec2_key_client = boto3.client('ec2', "us-west-1")
-    #ec2_keypair = ec2_key_client.create_key_pair(KeyName=ec2_key_name) 
-    #ec2_priv_key = ec2_keypair['KeyMaterial']
-    #ec2_keypair.save("/home/ubuntu/")
-    #with open("/home/ubuntu/" + ec2_key_name + ".pem", "w") as f:
-    #    f.write(ec2_priv_key)
-    #print(ec2_priv_key)
-    
+    ec2_key_name = "foo12"
+    ec2 = boto3.client('ec2', "us-west-1")
+    ec2_keypair = ec2.create_key_pair(KeyName=ec2_key_name) 
+    ec2_priv_key = ec2_keypair['KeyMaterial']
+    with open("/home/ubuntu/" + ec2_key_name + ".pem", "w") as f:
+        f.write(ec2_priv_key)
+    print(ec2_priv_key)
+
+    ec2_security_group_ids = rospy.get_param('~ec2_security_group_ids', [])
+    if not ec2_security_group_ids:
+        response = ec2.describe_vpcs()
+        vpc_id = response.get('Vpcs', [{}])[0].get('VpcId', '')
+
+        try:
+            response = ec2.create_security_group(GroupName='SECURITY_GROUP_NAME2',
+                                         Description='DESCRIPTION',
+                                         VpcId=vpc_id)
+            security_group_id = response['GroupId']
+            print('Security Group Created %s in vpc %s.' % (security_group_id, vpc_id))
+
+            data = ec2.authorize_security_group_ingress(
+                GroupId=security_group_id,
+                IpPermissions=[
+                    {'IpProtocol': '-1',
+                     'FromPort': 0,
+                     'ToPort': 65535,
+                     'IpRanges': [{'CidrIp': '0.0.0.0/0'}]
+                    }
+                ])
+            print('Ingress Successfully Set %s' % data)
+            ec2_security_group_ids = [security_group_id]
+        except ClientError as e:
+            print(e)
+    print("security group id is " + str(ec2_security_group_ids))
+            
     #
     # start EC2 instance
     # note that we can start muliple instances at the same time
@@ -57,7 +85,9 @@ if __name__ == '__main__':
     print("Have created the instance: ", instances)
     instance = instances[0]
     # use the boto3 waiter
+    print("wait for launching to finish")
     instance.wait_until_running()
+    print("launch finished")
     # reload instance object
     instance.reload()
     #instance_dict = ec2.describe_instances().get('Reservations')[0]
@@ -97,7 +127,6 @@ if __name__ == '__main__':
     # get public ip address of the EC2 server
     #instance_id = "i-0830a57e084eb8799"
     #instance = ec2_resource.Instance(instance_id)
-    import time
     
     public_ip = instance.public_ip_address
     while not public_ip:

@@ -5,7 +5,7 @@
     <rosparam>
     # ROSbridge websocket server info
     # you may fill the rosbridge's ip address or use the following placeholder for the client
-    rosbridge_ip: 54.176.16.188 
+    rosbridge_ip: 13.56.183.108 
     rosbridge_port: 9090
     # Topics being published in the robot to expose locally
     remote_topics: [
@@ -17,11 +17,11 @@
     ]
     # Services running in the robot to expose locally
     remote_services: [
-     ['/add_two_ints', 'beginner_tutorials/AddTwoInts']
+     ['/add_two_ints', 'roscloud/AddTwoInts']
     ]
     # Services running locally to expose to the robot
     local_services: [
-     ['/add_two_ints', 'beginner_tutorials/AddTwoInts']
+     ['/add_two_ints', 'roscloud/AddTwoInts']
     ]
     # Parameters to be sync, they will be polled to stay in sync
     #parameters: []
