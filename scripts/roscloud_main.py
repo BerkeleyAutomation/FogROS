@@ -121,9 +121,11 @@ if __name__ == '__main__':
 
         # use SSH to unzip them to the catkin workspace
         stdin, stdout, stderr = ssh_client.exec_command("cd ~/catkin_ws/src && for i in *.zip; do unzip -o \"$i\" -d . ; done " , get_pty=True)
-        
+
+        CRED = '\033[91m'
+        CEND = '\033[0m'
         for line in iter(stdout.readline, ""):
-            print(line, end="")
+            print(CRED + line + CEND, end="")
 
         # use SSH to upload the launch script
         scp.put(launch_file_dir + "/" + TO_CLOUD_LAUNCHFILE_NAME, "~/catkin_ws/src/roscloud/launch/" + TO_CLOUD_LAUNCHFILE_NAME)
@@ -133,4 +135,4 @@ if __name__ == '__main__':
         stdin, stdout, stderr = ssh_client.exec_command('cd ~/catkin_ws/ && source ./devel/setup.bash && catkin_make && roslaunch roscloud ' + TO_CLOUD_LAUNCHFILE_NAME , get_pty=True)
 
         for line in iter(stdout.readline, ""):
-            print(line, end="")        
+            print("EC2: " + CRED + line + CEND, end="")        
