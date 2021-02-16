@@ -141,6 +141,7 @@ include_directories(
 ## in contrast to setup.py, you can choose the destination
 install(PROGRAMS
   scripts/roscloud_main.py
+  scripts/rosduct_main.py
   examples/talker.py
   examples/listener.py
   examples/add_two_ints_client.py

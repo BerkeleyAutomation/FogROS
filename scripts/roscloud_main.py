@@ -34,7 +34,7 @@ if __name__ == '__main__':
     # TODO: get a new one if this paramter is not there
     ec2_key_name = rospy.get_param('~ec2_key_name')
 
-    ec2_key_name = "foo12"
+    ec2_key_name = "foo14"
     ec2 = boto3.client('ec2', "us-west-1")
     ec2_keypair = ec2.create_key_pair(KeyName=ec2_key_name) 
     ec2_priv_key = ec2_keypair['KeyMaterial']
