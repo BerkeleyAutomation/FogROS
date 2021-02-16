@@ -1,11 +1,11 @@
 <launch>
   <node name="talker_node" pkg="roscloud" type="talker.py" output="screen"/>
   <node name="add_two_int_node" pkg="roscloud" type="add_two_ints_server.py" output="screen"/>	
-  <node pkg="rosduct" name="rosduct" type="rosduct_main.py" output="screen">
+  <node pkg="roscloud" name="rosduct" type="rosduct_main.py" output="screen">
     <rosparam>
     # ROSbridge websocket server info
     # you may fill the rosbridge's ip address or use the following placeholder for the client
-    rosbridge_ip: 13.56.183.108 
+    rosbridge_ip: 3.101.28.51 
     rosbridge_port: 9090
     # Topics being published in the robot to expose locally
     remote_topics: [
