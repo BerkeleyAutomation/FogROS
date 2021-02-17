@@ -86,26 +86,12 @@ class ROSduct(object):
 
         self.initialize()
 
-    def initialize(self):
-        """
-        Initialize creating all necessary bridged clients and servers.
-        """
-        connected = False
-        while not rospy.is_shutdown() and not connected:
-            try:
-                self.client = ROSBridgeClient(
-                    self.rosbridge_ip, self.rosbridge_port)
-                connected = True
-            except socket.error as e:
-                rospy.logwarn(
-                    'Error when opening websocket, is ROSBridge running?')
-                rospy.logwarn(e)
-                rospy.sleep(5.0)
-
-        # We keep track of the instanced stuff in this dict
-        self._instances = {'topics': [],
-                           'services': []}
+    def new_remote_topics(self):
         for r_t in self.remote_topics:
+            self.new_remote_topic(r_t)
+
+    def new_remote_topic(self, r_t):
+        if 1:
             if len(r_t) == 2:
                 topic_name, topic_type = r_t
                 local_name = topic_name
@@ -113,7 +99,7 @@ class ROSduct(object):
                 topic_name, topic_type, local_name = r_t
             rospub = rospy.Publisher(local_name,
                                      get_ROS_class(topic_type),
-                                     # SubscribeListener added later
+                                     # SubscribeListener added later                          
                                      queue_size=1)
 
             cb_r_to_l = self.create_callback_from_remote_to_local(topic_name,
@@ -127,9 +113,14 @@ class ROSduct(object):
                 {topic_name:
                  {'rospub': rospub,
                   'bridgesub': None}
-                 })
+	         })
 
+    def new_local_topics(self):
         for l_t in self.local_topics:
+            self.new_local_topic(l_t)
+
+    def new_local_topic(self, l_t):
+        if 1:
             if len(l_t) == 2:
                 topic_name, topic_type = l_t
                 remote_name = topic_name
@@ -150,9 +141,13 @@ class ROSduct(object):
                  {'rossub': rossub,
                   'bridgepub': bridgepub}
                  })
-
-        # Services
+    
+    def new_remote_services(self):
         for r_s in self.remote_services:
+            self.new_remote_service(r_s)
+            
+    def new_remote_service(self, r_s):
+        if 1:
             if len(r_s) == 2:
                 service_name, service_type = r_s
                 local_name = service_name
@@ -165,7 +160,7 @@ class ROSduct(object):
                 service_name,
                 service_type)
             rosserv = rospy.Service(local_name,
-                                    get_ROS_class(service_type,
+		                    get_ROS_class(service_type,
                                                   srv=True),
                                     r_to_l_serv_cb)
 
@@ -173,9 +168,15 @@ class ROSduct(object):
                 {service_name:
                  {'rosserv': rosserv,
                   'bridgeservclient': remote_service_client}
-                 })
+		 })
 
+    def new_local_services(self):
         for l_s in self.local_services:
+            print(l_s)
+            self.new_local_service(l_s)
+            
+    def new_local_service(self, l_s):
+        if 1:
             if len(l_s) == 2:
                 service_name, service_type = l_s
                 remote_name = service_name
@@ -197,6 +198,31 @@ class ROSduct(object):
                   'bridgeservserver': remote_service_server}
                  })
 
+    def initialize(self):
+        """
+        Initialize creating all necessary bridged clients and servers.
+        """
+        connected = False
+        while not rospy.is_shutdown() and not connected:
+            try:
+                self.client = ROSBridgeClient(
+                    self.rosbridge_ip, self.rosbridge_port)
+                connected = True
+            except socket.error as e:
+                rospy.logwarn(
+                    'Error when opening websocket, is ROSBridge running?')
+                rospy.logwarn(e)
+                rospy.sleep(5.0)
+
+        # We keep track of the instanced stuff in this dict
+        self._instances = {'topics': [],
+                           'services': []}
+
+        self.new_remote_topics()
+        self.new_local_topics()
+        self.new_remote_services()
+        self.new_local_services()
+        
         # Get all params and store them for further updates
         for param in self.parameters:
             if type(param) == list:
@@ -378,6 +404,18 @@ class ROSduct(object):
                 rospy.set_param(local_param, remote_param)
                 self.last_params[param] = remote_param
 
+    def sync_topics(self):
+        current_remote_topics = self.client.get_topics()
+        current_local_topics = [topic[0] for topic in rospy.get_published_topics()]
+        add_to_local_topics = set(current_remote_topics) - set(current_local_topics)
+        add_to_remote_topics = set(current_local_topics) - set(current_remote_topics)
+        print("Add to local topics", add_to_local_topics)
+        print("Add to remote topics", add_to_remote_topics)
+
+        # add to local topic
+        
+
+        
     def spin(self):
         """
         Run the node, needed to update the parameter server.
@@ -385,6 +423,7 @@ class ROSduct(object):
         r = rospy.Rate(self.rate_hz)
         while not rospy.is_shutdown():
             self.sync_params()
+            self.sync_topics()
             r.sleep()
 
 
