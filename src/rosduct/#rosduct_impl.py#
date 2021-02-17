@@ -424,7 +424,7 @@ class ROSduct(object):
                 if n == l_t:
                     topic_type = t
             self.new_local_topic([l_t, topic_type])
-
+        
         
     def spin(self):
         """

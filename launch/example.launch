@@ -8,13 +8,9 @@
     rosbridge_ip: ROSBRIDGE_IP_ADDR_REPLACE 
     rosbridge_port: 9090
     # Topics being published in the robot to expose locally
-    remote_topics: [
-                        ['/chatter', 'std_msgs/String']
-                        ]
+    remote_topics: []
     # Topics being published in the local roscore to expose remotely
-    local_topics: [
-    ['/chatter', 'std_msgs/String']
-    ]
+    local_topics: []
     # Services running in the robot to expose locally
     remote_services: [
      ['/add_two_ints', 'roscloud/AddTwoInts']

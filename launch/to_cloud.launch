@@ -8,12 +8,9 @@
     rosbridge_ip: 3.101.28.51 
     rosbridge_port: 9090
     # Topics being published in the robot to expose locally
-    remote_topics: [
-                        ['/chatter', 'std_msgs/String']
-                        ]
+    remote_topics: []
     # Topics being published in the local roscore to expose remotely
     local_topics: [
-    ['/chatter', 'std_msgs/String']
     ]
     # Services running in the robot to expose locally
     remote_services: [
