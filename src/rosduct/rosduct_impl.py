@@ -425,6 +425,94 @@ class ROSduct(object):
                     topic_type = t
             self.new_local_topic([l_t, topic_type])
 
+    
+    def sync_topics(self):
+        current_remote_topics = self.client.get_topics()
+        current_local_topic_with_types = rospy.get_published_topics()
+        current_local_topics = [topic[0] for topic in current_local_topic_with_types]
+        add_to_local_topics = set(current_remote_topics) - set(current_local_topics)
+        add_to_remote_topics = set(current_local_topics) - set(current_remote_topics)
+        print("Add to local topics", add_to_local_topics)
+        print("Add to remote topics", add_to_remote_topics)
+
+        # add to local from remote topic
+        for r_t in add_to_local_topics:
+            topic_type = self.client.get_topic_type(r_t)
+            self.new_remote_topic([r_t, topic_type])
+
+        # add to remote from local topic
+        for l_t in add_to_remote_topics:
+            for n, t in current_local_topic_with_types:
+                if n == l_t:
+                    topic_type = t
+            self.new_local_topic([l_t, topic_type])
+    
+    def sync_topics(self):
+        current_remote_topics = self.client.get_topics()
+        current_local_topic_with_types = rospy.get_published_topics()
+        current_local_topics = [topic[0] for topic in current_local_topic_with_types]
+        add_to_local_topics = set(current_remote_topics) - set(current_local_topics)
+        add_to_remote_topics = set(current_local_topics) - set(current_remote_topics)
+        print("Add to local topics", add_to_local_topics)
+        print("Add to remote topics", add_to_remote_topics)
+
+        # add to local from remote topic
+        for r_t in add_to_local_topics:
+            topic_type = self.client.get_topic_type(r_t)
+            self.new_remote_topic([r_t, topic_type])
+
+        # add to remote from local topic
+        for l_t in add_to_remote_topics:
+            for n, t in current_local_topic_with_types:
+                if n == l_t:
+                    topic_type = t
+            self.new_local_topic([l_t, topic_type])
+
+    def sync_topics(self):
+        current_remote_topics = self.client.get_topics()
+        current_local_topic_with_types = rospy.get_published_topics()
+        current_local_topics = [topic[0] for topic in current_local_topic_with_types]
+        add_to_local_topics = set(current_remote_topics) - set(current_local_topics)
+        add_to_remote_topics = set(current_local_topics) - set(current_remote_topics)
+        print("Add to local topics", add_to_local_topics)
+        print("Add to remote topics", add_to_remote_topics)
+
+        # add to local from remote topic
+        for r_t in add_to_local_topics:
+            topic_type = self.client.get_topic_type(r_t)
+            self.new_remote_topic([r_t, topic_type])
+
+        # add to remote from local topic
+        for l_t in add_to_remote_topics:
+            for n, t in current_local_topic_with_types:
+                if n == l_t:
+                    topic_type = t
+            self.new_local_topic([l_t, topic_type])
+
+    def sync_services(self):
+        import rosservice
+        current_remote_services = [service for service in self.client.get_services() if not service.startswith("/ros")]
+        current_local_services = [service for service in rosservice.get_service_list() if not service.startswith("/ros")]
+        print(current_remote_services)
+        print(current_local_services)
+        add_to_local_services = set(current_remote_services) - set(current_local_services)
+        add_to_remote_services = set(current_local_services) - set(current_remote_services)
+        print("Add to local services", add_to_local_services)
+        print("Add to remote services", add_to_remote_services)
+
+        # add to local from remote service
+        for r_s in add_to_local_services:
+            service_type = self.client.get_service_type(r_s)
+            self.new_remote_service([r_s, service_type])
+
+        # add to remote from local service
+        for l_s in add_to_remote_services:
+            #for n, t in current_local_service_with_types:
+            #    if n == l_t:
+            #        service_type = t
+            service_type = rosservice.get_service_type(l_s)
+            self.new_local_service([l_s, service_type])
+
         
     def spin(self):
         """
@@ -434,6 +522,7 @@ class ROSduct(object):
         while not rospy.is_shutdown():
             self.sync_params()
             self.sync_topics()
+            self.sync_services()
             r.sleep()
 
 
