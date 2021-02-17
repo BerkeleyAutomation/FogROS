@@ -10,6 +10,9 @@ RosCloud enables ROS application developers to easily offload their ROS applicat
 
 ## How to set it up
 
+#### Step 0: Set up ROS
+Set up ROS environment and clone this repo to catkin workspace. ```ami-05829bd3e68bcd415``` is a good starting point. 
+
 
 #### Step 1:  Set up the repo's environments
 
