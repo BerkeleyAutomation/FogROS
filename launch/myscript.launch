@@ -1,24 +1,24 @@
 <launch>
-  <node name="listener_node" pkg="beginner_tutorials" type="listener.py" output="screen"/>
-  <node name="talker_node" pkg="beginner_tutorials" type="talker.py" output="screen"/>
-  <node pkg="rosduct" name="rosduct" type="rosduct_main.py" output="screen">
+  <node name="talker_node" pkg="roscloud" type="talker.py" output="screen"/>
+  <node name="add_two_int_node" pkg="roscloud" type="add_two_ints_server.py" output="screen"/>	
+  <node pkg="roscloud" name="rosduct" type="rosduct_main.py" output="screen">
     <rosparam>
     # ROSbridge websocket server info
     # you may fill the rosbridge's ip address or use the following placeholder for the client
     rosbridge_ip: ROSBRIDGE_IP_ADDR_REPLACE 
     rosbridge_port: 9090
     # Topics being published in the robot to expose locally
-    remote_topics: [
-                        ['/chatter', 'std_msgs/String']
-                        ]
+    remote_topics: []
     # Topics being published in the local roscore to expose remotely
-    local_topics: [
-    ['/chatter', 'std_msgs/String']
-    ]
+    local_topics: []
     # Services running in the robot to expose locally
-    remote_services: []
+    remote_services: [
+     ['/add_two_ints', 'roscloud/AddTwoInts']
+    ]
     # Services running locally to expose to the robot
-    local_services: []
+    local_services: [
+     ['/add_two_ints', 'roscloud/AddTwoInts']
+    ]
     # Parameters to be sync, they will be polled to stay in sync
     #parameters: []
     #parameter_polling_hz: 1

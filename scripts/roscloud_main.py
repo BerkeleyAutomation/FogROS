@@ -34,7 +34,9 @@ if __name__ == '__main__':
     # TODO: get a new one if this paramter is not there
     ec2_key_name = rospy.get_param('~ec2_key_name')
 
-    ec2_key_name = "foo14"
+    import random
+    rand_int = str(random.randint(10, 1000))
+    ec2_key_name = "foo" + rand_int
     ec2 = boto3.client('ec2', "us-west-1")
     ec2_keypair = ec2.create_key_pair(KeyName=ec2_key_name) 
     ec2_priv_key = ec2_keypair['KeyMaterial']
@@ -48,7 +50,7 @@ if __name__ == '__main__':
         vpc_id = response.get('Vpcs', [{}])[0].get('VpcId', '')
 
         try:
-            response = ec2.create_security_group(GroupName='SECURITY_GROUP_NAME2',
+            response = ec2.create_security_group(GroupName='SECURITY_GROUP_NAME'+rand_int,
                                          Description='DESCRIPTION',
                                          VpcId=vpc_id)
             security_group_id = response['GroupId']
@@ -73,6 +75,7 @@ if __name__ == '__main__':
     # start EC2 instance
     # note that we can start muliple instances at the same time
     #
+    ec2_instance_type ="t2.large"
     ec2_resource = boto3.resource('ec2', "us-west-1")
     instances = ec2_resource.create_instances(
         ImageId=image_id,
@@ -141,7 +144,6 @@ if __name__ == '__main__':
     #private_key = paramiko.RSAKey.from_private_key(keyfile) ./priv_key.pem
     time.sleep(20)
     private_key = paramiko.RSAKey.from_private_key_file("/home/ubuntu/" + ec2_key_name + ".pem")
-    print(private_key)
     ssh_client = paramiko.SSHClient()
     ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh_client.connect(hostname = public_ip, username = "ubuntu", pkey = private_key, look_for_keys=False )
@@ -154,12 +156,21 @@ if __name__ == '__main__':
         # use SCP to upload the launch script
         scp.put(launch_file_dir + "/" + TO_CLOUD_LAUNCHFILE_NAME, "~/catkin_ws/src/roscloud/launch/" + TO_CLOUD_LAUNCHFILE_NAME)
 
+        scp.put(launch_file_dir + "/setup.bash", "~/setup.bash")
+
             
         # use SSH to unzip them to the catkin workspace
         stdin, stdout, stderr = ssh_client.exec_command("cd ~/catkin_ws/src && for i in *.zip; do unzip -o \"$i\" -d . ; done " , get_pty=True)
 
         CRED = '\033[91m'
         CEND = '\033[0m'
+        for line in iter(stdout.readline, ""):
+            print(CRED + line + CEND, end="")
+
+        
+        # execute setup script
+        stdin, stdout, stderr = ssh_client.exec_command("chmod +x ~/setup.bash && ~/setup.bash" , get_pty=True)
+
         for line in iter(stdout.readline, ""):
             print(CRED + line + CEND, end="")
 
