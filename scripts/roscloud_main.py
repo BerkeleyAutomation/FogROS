@@ -83,7 +83,16 @@ if __name__ == '__main__':
         MaxCount=1,
         InstanceType=ec2_instance_type,
         KeyName= ec2_key_name,
-        SecurityGroupIds= ec2_security_group_ids
+        SecurityGroupIds= ec2_security_group_ids,
+        BlockDeviceMappings=[
+            {
+                'DeviceName': '/dev/sda1',
+                'Ebs': {
+                    'VolumeSize': 30,
+                    'VolumeType': 'standard'
+                }
+            }
+        ]
     )
     print("Have created the instance: ", instances)
     instance = instances[0]
@@ -142,7 +151,7 @@ if __name__ == '__main__':
     #keyfile.seek(0)
     # start a SSH/SCP session to the EC2 server 
     #private_key = paramiko.RSAKey.from_private_key(keyfile) ./priv_key.pem
-    time.sleep(20)
+    time.sleep(60)
     private_key = paramiko.RSAKey.from_private_key_file("/home/ubuntu/" + ec2_key_name + ".pem")
     ssh_client = paramiko.SSHClient()
     ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())

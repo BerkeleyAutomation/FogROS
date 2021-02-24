@@ -7,8 +7,10 @@
     <rosparam>
 
     # the launchfile that you hope to run on remote server
-    launch_file: "/home/ubuntu/catkin_ws/src/roscloud/launch/example.launch"
-
+    # launch_file: "/home/ubuntu/catkin_ws/src/roscloud/launch/example.launch"
+    # launch_file: "/home/ubuntu/catkin_ws/src/roscloud/launch/mpl.launch"
+    launch_file: "/home/ubuntu/catkin_ws/src/roscloud/launch/gqcnn.launch"
+    
     # EC2 related paramters 
     ec2_instance_image: ami-05829bd3e68bcd415
     ec2_instance_type: t2.micro
