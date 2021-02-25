@@ -1,33 +1,17 @@
 <launch>
   # start rosbridge websocket server
-  # comment this line if have rosbridge on another terminal/server 
   <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />	
-
-  <node pkg="roscloud" name="roscloud_node" type="roscloud_main.py" output="screen">
-    <rosparam>
-
-    # the launchfile that you hope to run on remote server
-    # launch_file: "/home/ubuntu/catkin_ws/src/roscloud/launch/example.launch"
-    # launch_file: "/home/ubuntu/catkin_ws/src/roscloud/launch/mpl.launch"
-    launch_file: "/home/ubuntu/catkin_ws/src/roscloud/launch/gqcnn.launch"
-    
-    # EC2 related paramters 
-    ec2_instance_image: ami-05829bd3e68bcd415
-    ec2_instance_type: t2.micro
-    # NOTE: the following paramter must changed based on
-    # your AWS account settings
-    # the name of an existing AWS keypair
-    ec2_key_name: ros-ec2
-    # security group that allows traffic to your host machine
-    ec2_security_group_ids: [] #leave empty, the system will create one for you
-    
-    # optional parameters
-    # a temperary folder for putting zip files of the packages
-    temporary_dir: "/tmp"
-    # to avoid name conflict, the name of launch file that
-    # you want to store in the cloud
-    to_cloud_launchfile_name : "to_cloud.launch"
-    
-    </rosparam>
+  
+  <node name="roscloud_node1" pkg="roscloud" type="roscloud_push.py" output="screen">
+  	<param name="instance_type" value="t2.micro"/>
+    	<param name="launch_script" value="mpt_ros_node.launch" />
+ 	<param name="env_script" value="mpt_ros_setup.bash"/>
   </node>
+  
+  <node name="roscloud_docker" pkg="roscloud" type="roscloud_docker.py" output="screen">
+  	<param name="instance_type" value="t2.micro"/>
+ 	<param name="docker_image" value="keplerc/grasp_image:cpu"/>
+  </node>
+  
+
 </launch>
