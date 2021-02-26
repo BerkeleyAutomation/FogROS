@@ -12,51 +12,28 @@ from scp import SCPClient
 from io import StringIO
 from requests import get
 import time
+import random
+
+# ec2 console coloring 
+CRED = '\033[91m'
+CEND = '\033[0m'
 
 def make_zip_file(dir_name, target_path):
     pwd, package_name = os.path.split(dir_name)
     return shutil.make_archive(base_dir = package_name, root_dir = pwd, format = "zip", base_name = target_path)
 
-if __name__ == '__main__':
-    rospy.init_node('roscloud')
-   
-    #
-    # read in parameters from the launch script
-    #
-    TO_CLOUD_LAUNCHFILE_NAME = rospy.get_param('~to_cloud_launchfile_name', "to_cloud.launch")
+def aws_create_security_group(ec2, ec2_security_group):
+    response = ec2.describe_vpcs()
+    vpc_id = response.get('Vpcs', [{}])[0].get('VpcId', '')
 
-    MY_IP_ADDR = get('https://api.ipify.org').text
-    print("my ip address is ", MY_IP_ADDR)
-    ZIP_FILE_TMP_PATH = rospy.get_param('~temporary_dir', "/tmp")
-    image_id = rospy.get_param('~ec2_instance_image', 'ami-05829bd3e68bcd415')
-    ec2_instance_type = rospy.get_param('~ec2_instance_type', 't2.micro')
-    # name of existing key pair
-    # TODO: get a new one if this paramter is not there
-    ec2_key_name = rospy.get_param('~ec2_key_name')
-
-    import random
-    rand_int = str(random.randint(10, 1000))
-    ec2_key_name = "foo" + rand_int
-    ec2 = boto3.client('ec2', "us-west-1")
-    ec2_keypair = ec2.create_key_pair(KeyName=ec2_key_name) 
-    ec2_priv_key = ec2_keypair['KeyMaterial']
-    with open("/home/ubuntu/" + ec2_key_name + ".pem", "w") as f:
-        f.write(ec2_priv_key)
-    print(ec2_priv_key)
-
-    ec2_security_group_ids = rospy.get_param('~ec2_security_group_ids', [])
-    if not ec2_security_group_ids:
-        response = ec2.describe_vpcs()
-        vpc_id = response.get('Vpcs', [{}])[0].get('VpcId', '')
-
-        try:
-            response = ec2.create_security_group(GroupName='SECURITY_GROUP_NAME'+rand_int,
+    try:
+        response = ec2.create_security_group(GroupName=ec2_security_group,
                                          Description='DESCRIPTION',
                                          VpcId=vpc_id)
-            security_group_id = response['GroupId']
-            print('Security Group Created %s in vpc %s.' % (security_group_id, vpc_id))
+        security_group_id = response['GroupId']
+        print('Security Group Created %s in vpc %s.' % (security_group_id, vpc_id))
 
-            data = ec2.authorize_security_group_ingress(
+        data = ec2.authorize_security_group_ingress(
                 GroupId=security_group_id,
                 IpPermissions=[
                     {'IpProtocol': '-1',
@@ -65,20 +42,29 @@ if __name__ == '__main__':
                      'IpRanges': [{'CidrIp': '0.0.0.0/0'}]
                     }
                 ])
-            print('Ingress Successfully Set %s' % data)
-            ec2_security_group_ids = [security_group_id]
-        except ClientError as e:
-            print(e)
+        print('Ingress Successfully Set %s' % data)
+        ec2_security_group_ids = [security_group_id]
+    except ClientError as e:
+        print(e)
     print("security group id is " + str(ec2_security_group_ids))
-            
+    return ec2_security_group_ids
+
+def aws_generate_key_pair(ec2, ec2_key_name):
+    ec2_keypair = ec2.create_key_pair(KeyName=ec2_key_name) 
+    ec2_priv_key = ec2_keypair['KeyMaterial']
+    with open("/home/ubuntu/" + ec2_key_name + ".pem", "w") as f:
+        f.write(ec2_priv_key)
+    print(ec2_priv_key)
+    return ec2_priv_key
+
+
+def aws_create_instance(ec2_resource, ec2_key_name, ec2_security_group_ids, ec2_instance_type="t2.large", ec2_instance_disk_size = 8):
     #
     # start EC2 instance
     # note that we can start muliple instances at the same time
     #
-    ec2_instance_type ="t2.large"
-    ec2_resource = boto3.resource('ec2', "us-west-1")
     instances = ec2_resource.create_instances(
-        ImageId=image_id,
+        ImageId='ami-05829bd3e68bcd415',
         MinCount=1,
         MaxCount=1,
         InstanceType=ec2_instance_type,
@@ -104,20 +90,32 @@ if __name__ == '__main__':
     instance.reload()
     #instance_dict = ec2.describe_instances().get('Reservations')[0]
     #print(instance_dict)
-    
+    return instance 
+
+def prepare_launch_file(launch_file):
 
     # 
     # read in the launchfile 
     # we also modify the launchfile IP address to this machine's public IP address
     # 
-    launch_file = rospy.get_param('~launch_file')
-    
+    launch_file_dir , launch_file_name = os.path.split(launch_file)
     with open(launch_file) as f:
         launch_text = f.read()
-        launch_file_dir , launch_file_name = os.path.split(launch_file)
-    # TODO: change the modified launch file address to a temporary folder
-    with open(launch_file_dir + "/" + TO_CLOUD_LAUNCHFILE_NAME , "w") as f:
-        f.write(launch_text.replace("ROSBRIDGE_IP_ADDR_REPLACE", MY_IP_ADDR))
+
+    my_ip = get('https://api.ipify.org').text
+    print("robot public address is ", my_ip)
+
+    rosduct_launch_text = '''
+    <node pkg="roscloud" name="rosduct" type="rosduct_main.py" output="screen">
+    <rosparam>
+        rosbridge_ip: ''' + my_ip + ''''
+        rosbridge_port: 9090
+    </rosparam>
+    </node>
+</launch>
+    '''
+    with open("/tmp/to_cloud.launch" , "w") as f:
+        f.write(launch_text.replace("</launch>", rosduct_launch_text))
         
     # find all the ROS packages in the launchscript
     # package need to follow ros naming convention
@@ -134,24 +132,29 @@ if __name__ == '__main__':
         pkg_path = rospack.get_path(package)
         zip_path = make_zip_file(pkg_path, "/tmp/" + package)
         zip_paths.append(zip_path)
+    return zip_paths 
 
 
-    # get public ip address of the EC2 server
-    #instance_id = "i-0830a57e084eb8799"
-    #instance = ec2_resource.Instance(instance_id)
-    
+def create_ec2_pipeline(ec2_instance_type = "t2.large", image_id = "ami-05829bd3e68bcd415"):
+    rand_int = str(random.randint(10, 1000))
+    ec2_key_name = "foo" + rand_int
+    ec2_security_group_name = 'SECURITY_GROUP_NAME' + rand_int
+    ec2_resource = boto3.resource('ec2', "us-west-1")
+    ec2 = boto3.client('ec2', "us-west-1")
+    ec2_priv_key = aws_generate_key_pair(ec2, ec2_key_name)
+    ec2_security_group_ids = aws_create_security_group(ec2, ec2_security_group_name)
+    instance = aws_create_instance(ec2_resource, ec2_key_name, ec2_security_group_ids)
     public_ip = instance.public_ip_address
     while not public_ip:
         instance.reload()
         public_ip = instance.public_ip_address
-        print(public_ip)
+    print("public ip of ec2: " + public_ip)
+    return public_ip, ec2_key_name
 
-    #keyfile = StringIO()
-    #keyfile.write(ec2_priv_key)
-    #keyfile.seek(0)
-    # start a SSH/SCP session to the EC2 server 
-    #private_key = paramiko.RSAKey.from_private_key(keyfile) ./priv_key.pem
-    time.sleep(60)
+
+
+    
+def connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir):
     private_key = paramiko.RSAKey.from_private_key_file("/home/ubuntu/" + ec2_key_name + ".pem")
     ssh_client = paramiko.SSHClient()
     ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -163,7 +166,7 @@ if __name__ == '__main__':
             scp.put(zip_file, '~/catkin_ws/src')
 
         # use SCP to upload the launch script
-        scp.put(launch_file_dir + "/" + TO_CLOUD_LAUNCHFILE_NAME, "~/catkin_ws/src/roscloud/launch/" + TO_CLOUD_LAUNCHFILE_NAME)
+        scp.put("/tmp/to_cloud.launch", "~/catkin_ws/src/roscloud/launch/to_cloud.launch")
 
         scp.put(launch_file_dir + "/setup.bash", "~/setup.bash")
 
@@ -171,8 +174,6 @@ if __name__ == '__main__':
         # use SSH to unzip them to the catkin workspace
         stdin, stdout, stderr = ssh_client.exec_command("cd ~/catkin_ws/src && for i in *.zip; do unzip -o \"$i\" -d . ; done " , get_pty=True)
 
-        CRED = '\033[91m'
-        CEND = '\033[0m'
         for line in iter(stdout.readline, ""):
             print(CRED + line + CEND, end="")
 
@@ -186,7 +187,33 @@ if __name__ == '__main__':
 
         # catkin_make all the uploaded packages
         # roslaunch the script on EC2  
-        stdin, stdout, stderr = ssh_client.exec_command('cd ~/catkin_ws/ && source ./devel/setup.bash && catkin_make && roslaunch roscloud ' + TO_CLOUD_LAUNCHFILE_NAME , get_pty=True)
+        stdin, stdout, stderr = ssh_client.exec_command('cd ~/catkin_ws/ && source ./devel/setup.bash && catkin_make && roslaunch roscloud to_cloud.launch' , get_pty=True)
 
         for line in iter(stdout.readline, ""):
             print("EC2: " + CRED + line + CEND, end="")        
+
+
+
+def push_launch(launch_file):
+   
+    public_ip, ec2_key_name =create_ec2_pipeline()
+    launch_file_dir , launch_file_name = os.path.split(launch_file)
+    zip_paths = prepare_launch_file(launch_file)
+
+    time.sleep(60)
+    connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir)
+
+    
+def push_docker(docker_image):
+
+    public_ip, ec2_key_name =create_ec2_pipeline()
+    launch_file_dir , launch_file_name = os.path.split(launch_file)
+    zip_paths = prepare_launch_file(launch_file)
+
+    time.sleep(60)
+    connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir)
+
+if __name__ == "__main__":
+    rospy.init_node('roscloud')
+    launch_file = rospy.get_param('~launch_file')
+    push_launch(launch_file)

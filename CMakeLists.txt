@@ -144,7 +144,9 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 install(PROGRAMS
-  scripts/roscloud_main.py
+  scripts/roscloud_base.py
+  scripts/roscloud_launch.py
+  scripts/roscloud_docker.py 
   scripts/rosduct_main.py
   examples/talker.py
   examples/listener.py

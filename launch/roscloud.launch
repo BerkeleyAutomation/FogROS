@@ -2,9 +2,9 @@
   # start rosbridge websocket server
   <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />	
   
-  <node name="roscloud_node1" pkg="roscloud" type="roscloud_push.py" output="screen">
+  <node name="roscloud_node1" pkg="roscloud" type="roscloud_launch.py" output="screen">
   	<param name="instance_type" value="t2.micro"/>
-    	<param name="launch_script" value="mpt_ros_node.launch" />
+    	<param name="launch_file" value="mpt_ros_node.launch" />
  	<param name="env_script" value="mpt_ros_setup.bash"/>
   </node>
   

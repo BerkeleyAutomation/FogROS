@@ -13,20 +13,7 @@
     
     # EC2 related paramters 
     ec2_instance_image: ami-05829bd3e68bcd415
-    ec2_instance_type: t2.micro
-    # NOTE: the following paramter must changed based on
-    # your AWS account settings
-    # the name of an existing AWS keypair
-    ec2_key_name: ros-ec2
-    # security group that allows traffic to your host machine
-    ec2_security_group_ids: [] #leave empty, the system will create one for you
-    
-    # optional parameters
-    # a temperary folder for putting zip files of the packages
-    temporary_dir: "/tmp"
-    # to avoid name conflict, the name of launch file that
-    # you want to store in the cloud
-    to_cloud_launchfile_name : "to_cloud.launch"
+    ec2_instance_type: t2.micro    
     
     </rosparam>
   </node>
