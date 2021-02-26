@@ -74,13 +74,14 @@ def aws_create_instance(ec2_resource, ec2_key_name, ec2_security_group_ids, ec2_
             {
                 'DeviceName': '/dev/sda1',
                 'Ebs': {
-                    'VolumeSize': 30,
+                    'VolumeSize': 8,
                     'VolumeType': 'standard'
                 }
             }
         ]
     )
     print("Have created the instance: ", instances)
+    print("type: " + ec2_instance_type)
     instance = instances[0]
     # use the boto3 waiter
     print("wait for launching to finish")
@@ -143,7 +144,7 @@ def create_ec2_pipeline(ec2_instance_type = "t2.large", image_id = "ami-05829bd3
     ec2 = boto3.client('ec2', "us-west-1")
     ec2_priv_key = aws_generate_key_pair(ec2, ec2_key_name)
     ec2_security_group_ids = aws_create_security_group(ec2, ec2_security_group_name)
-    instance = aws_create_instance(ec2_resource, ec2_key_name, ec2_security_group_ids)
+    instance = aws_create_instance(ec2_resource, ec2_key_name, ec2_security_group_ids, ec2_instance_type)
     public_ip = instance.public_ip_address
     while not public_ip:
         instance.reload()
@@ -154,7 +155,7 @@ def create_ec2_pipeline(ec2_instance_type = "t2.large", image_id = "ami-05829bd3
 
 
     
-def connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir):
+def connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_script):
     private_key = paramiko.RSAKey.from_private_key_file("/home/ubuntu/" + ec2_key_name + ".pem")
     ssh_client = paramiko.SSHClient()
     ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -166,9 +167,10 @@ def connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir):
             scp.put(zip_file, '~/catkin_ws/src')
 
         # use SCP to upload the launch script
+        # TODO: there might be a collision if we run multiple nodes, need to solve it 
         scp.put("/tmp/to_cloud.launch", "~/catkin_ws/src/roscloud/launch/to_cloud.launch")
 
-        scp.put(launch_file_dir + "/setup.bash", "~/setup.bash")
+        scp.put(env_script, "~/setup.bash")
 
             
         # use SSH to unzip them to the catkin workspace
@@ -194,26 +196,30 @@ def connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir):
 
 
 
-def push_launch(launch_file):
+    
+def push_launch(launch_file, ec2_instance_type, env_script):
    
-    public_ip, ec2_key_name =create_ec2_pipeline()
+    public_ip, ec2_key_name =create_ec2_pipeline(ec2_instance_type)
     launch_file_dir , launch_file_name = os.path.split(launch_file)
     zip_paths = prepare_launch_file(launch_file)
 
     time.sleep(60)
-    connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir)
+    connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_script)
 
     
-def push_docker(docker_image):
+def push_docker(docker_image, ec2_instance_type):
 
-    public_ip, ec2_key_name =create_ec2_pipeline()
+    docker_str ='''
+sudo apt install -y docker.io
+sudo docker pull ''' + docker_image + '''
+sudo docker run -d --network host --rm ''' + docker_image
+
+    public_ip, ec2_key_name =create_ec2_pipeline(ec2_instance_type)
     launch_file_dir , launch_file_name = os.path.split(launch_file)
     zip_paths = prepare_launch_file(launch_file)
-
+    with open("/tmp/docker.bash", "w") as f:
+        f.write(docker_str)
+    
     time.sleep(60)
-    connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir)
+    connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_script)
 
-if __name__ == "__main__":
-    rospy.init_node('roscloud')
-    launch_file = rospy.get_param('~launch_file')
-    push_launch(launch_file)
