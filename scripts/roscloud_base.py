@@ -109,7 +109,7 @@ def prepare_launch_file(launch_file):
     rosduct_launch_text = '''
     <node pkg="roscloud" name="rosduct" type="rosduct_main.py" output="screen">
     <rosparam>
-        rosbridge_ip: ''' + my_ip + ''''
+        rosbridge_ip: ''' + my_ip + '''
         rosbridge_port: 9090
     </rosparam>
     </node>
