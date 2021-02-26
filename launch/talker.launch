@@ -1,0 +1,4 @@
+<launch>
+  <node name="talker_node" pkg="roscloud" type="talker.py" output="screen"/>
+  <node name="add_two_int_node" pkg="roscloud" type="add_two_ints_server.py" output="screen"/>
+</launch>

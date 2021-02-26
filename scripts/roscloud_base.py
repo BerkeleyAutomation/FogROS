@@ -103,7 +103,7 @@ def prepare_launch_file(launch_file):
     with open(launch_file) as f:
         launch_text = f.read()
 
-    my_ip = get('https://api.ipify.org').text
+    my_ip = get('https://checkip.amazonaws.com').text.strip() 
     print("robot public address is ", my_ip)
 
     rosduct_launch_text = '''
@@ -218,8 +218,9 @@ sudo docker run -d --network host --rm ''' + docker_image
 <launch>
 </launch>
 '''
-    tmp_launch_path = "/tmp/docker.launch"
-    with open(tmp_launch_path, "w") as f:
+    launch_file = "/tmp/docker.launch"
+    env_script = "/tmp/docker.bash"
+    with open(launch_file, "w") as f:
         f.write(launch_file_str)
     public_ip, ec2_key_name =create_ec2_pipeline(ec2_instance_type)
     launch_file_dir , launch_file_name = os.path.split(launch_file)
