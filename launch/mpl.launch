@@ -1,28 +1,4 @@
 <launch>
     <node name="client_node" pkg="mpt_ros" type="client" output="screen"/>
-  <node name="node_node" pkg="mpt_ros" type="node" output="screen"/>
-  <node pkg="roscloud" name="rosduct" type="rosduct_main.py" output="screen">
-    <rosparam>
-    # ROSbridge websocket server info
-    # you may fill the rosbridge's ip address or use the following placeholder for the client
-    rosbridge_ip: ROSBRIDGE_IP_ADDR_REPLACE 
-    rosbridge_port: 9090
-    # Topics being published in the robot to expose locally
-    remote_topics: []
-    # Topics being published in the local roscore to expose remotely
-    local_topics: []
-    # Services running in the robot to expose locally
-    remote_services: [
-     ['/add_two_ints', 'roscloud/AddTwoInts']
-    ]
-    # Services running locally to expose to the robot
-    local_services: [
-     ['/add_two_ints', 'roscloud/AddTwoInts']
-    ]
-    # Parameters to be sync, they will be polled to stay in sync
-    #parameters: []
-    #parameter_polling_hz: 1
-
-    </rosparam>
-  </node>
+    <node name="node_node" pkg="mpt_ros" type="node" output="screen"/>
 </launch>

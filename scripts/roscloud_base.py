@@ -214,6 +214,13 @@ sudo apt install -y docker.io
 sudo docker pull ''' + docker_image + '''
 sudo docker run -d --network host --rm ''' + docker_image
 
+    launch_file_str = '''
+<launch>
+</launch>
+'''
+    tmp_launch_path = "/tmp/docker.launch"
+    with open(tmp_launch_path, "w") as f:
+        f.write(launch_file_str)
     public_ip, ec2_key_name =create_ec2_pipeline(ec2_instance_type)
     launch_file_dir , launch_file_name = os.path.split(launch_file)
     zip_paths = prepare_launch_file(launch_file)
