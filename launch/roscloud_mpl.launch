@@ -6,12 +6,6 @@
   	<param name="instance_type" value="t2.micro"/>
    	<param name="launch_file" value="/home/ubuntu/catkin_ws/src/roscloud/launch/mpl.launch" />
   	<param name="env_script" value="/home/ubuntu/catkin_ws/src/roscloud/launch/mpl.bash"/>
-  </node>
-  
-  <node name="roscloud_docker" pkg="roscloud" type="roscloud_docker.py" output="screen">
-  	<param name="instance_type" value="t2.micro"/>
- 	<param name="docker_image" value="keplerc/grasp_image:cpu"/>
-  </node>
-  
+  </node>  
 
 </launch>
