@@ -243,7 +243,10 @@ class ROSduct(object):
             # Only convert and publish with subscribers
             if rospub.get_num_connections() >= 1:
                 msg = from_dict_to_ROS(message, topic_type)
-                rospub.publish(msg)
+                try:
+                    rospub.publish(msg)
+                except:
+                    print("published")
         return callback_remote_to_local
 
     def create_callback_from_local_to_remote(self,

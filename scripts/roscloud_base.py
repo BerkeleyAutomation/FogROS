@@ -74,7 +74,7 @@ def aws_create_instance(ec2_resource, ec2_key_name, ec2_security_group_ids, ec2_
             {
                 'DeviceName': '/dev/sda1',
                 'Ebs': {
-                    'VolumeSize': 8,
+                    'VolumeSize': 20,
                     'VolumeType': 'standard'
                 }
             }

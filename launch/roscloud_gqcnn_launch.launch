@@ -4,10 +4,8 @@
   
   <node name="roscloud_node1" pkg="roscloud" type="roscloud_launch.py" output="screen">
   	<param name="instance_type" value="t2.xlarge"/>
-   	<param name="launch_file" value="/home/ubuntu/catkin_ws/src/roscloud/launch/mpt.launch" />
-  	<param name="env_script" value="/home/ubuntu/catkin_ws/src/roscloud/launch/mpt.bash"/>
+   	<param name="launch_file" value="/home/ubuntu/catkin_ws/src/roscloud/launch/gqcnn.launch" />
+  	<param name="env_script" value="/home/ubuntu/catkin_ws/src/roscloud/launch/gqcnn.bash"/>
   </node>
-  
-  <node name="client_node" pkg="mpt_ros" type="client" output="screen"/>
   
 </launch>
