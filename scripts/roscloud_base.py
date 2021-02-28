@@ -192,17 +192,17 @@ def connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_
         stdin, stdout, stderr = ssh_client.exec_command('cd ~/catkin_ws/ && source ./devel/setup.bash && catkin_make && roslaunch roscloud to_cloud.launch' , get_pty=True)
 
         for line in iter(stdout.readline, ""):
-            print("EC2: " + CRED + line + CEND, end="")        
+            print("EC2: " + str(time.time()) + " " + CRED + line + CEND, end="")        
 
 
 
     
 def push_launch(launch_file, ec2_instance_type, env_script):
-   
+    print("start launching " + str(time.time()))
     public_ip, ec2_key_name =create_ec2_pipeline(ec2_instance_type)
     launch_file_dir , launch_file_name = os.path.split(launch_file)
     zip_paths = prepare_launch_file(launch_file)
-
+    
     time.sleep(60)
     connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_script)
 

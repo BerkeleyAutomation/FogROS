@@ -172,7 +172,6 @@ class ROSduct(object):
 
     def new_local_services(self):
         for l_s in self.local_services:
-            print(l_s)
             self.new_local_service(l_s)
             
     def new_local_service(self, l_s):
@@ -413,8 +412,8 @@ class ROSduct(object):
         current_local_topics = [topic[0] for topic in current_local_topic_with_types]
         add_to_local_topics = set(current_remote_topics) - set(current_local_topics)
         add_to_remote_topics = set(current_local_topics) - set(current_remote_topics)
-        print("Add to local topics", add_to_local_topics)
-        print("Add to remote topics", add_to_remote_topics)
+        #print("Add to local topics", add_to_local_topics)
+        #print("Add to remote topics", add_to_remote_topics)
 
         # add to local from remote topic
         for r_t in add_to_local_topics:
@@ -435,8 +434,8 @@ class ROSduct(object):
         current_local_topics = [topic[0] for topic in current_local_topic_with_types]
         add_to_local_topics = set(current_remote_topics) - set(current_local_topics)
         add_to_remote_topics = set(current_local_topics) - set(current_remote_topics)
-        print("Add to local topics", add_to_local_topics)
-        print("Add to remote topics", add_to_remote_topics)
+        #print("Add to local topics", add_to_local_topics)
+        #print("Add to remote topics", add_to_remote_topics)
 
         # add to local from remote topic
         for r_t in add_to_local_topics:
@@ -456,8 +455,8 @@ class ROSduct(object):
         current_local_topics = [topic[0] for topic in current_local_topic_with_types]
         add_to_local_topics = set(current_remote_topics) - set(current_local_topics)
         add_to_remote_topics = set(current_local_topics) - set(current_remote_topics)
-        print("Add to local topics", add_to_local_topics)
-        print("Add to remote topics", add_to_remote_topics)
+        #print("Add to local topics", add_to_local_topics)
+        #print("Add to remote topics", add_to_remote_topics)
 
         # add to local from remote topic
         for r_t in add_to_local_topics:
@@ -477,8 +476,8 @@ class ROSduct(object):
         current_local_topics = [topic[0] for topic in current_local_topic_with_types]
         add_to_local_topics = set(current_remote_topics) - set(current_local_topics)
         add_to_remote_topics = set(current_local_topics) - set(current_remote_topics)
-        print("Add to local topics", add_to_local_topics)
-        print("Add to remote topics", add_to_remote_topics)
+        #print("Add to local topics", add_to_local_topics)
+        #print("Add to remote topics", add_to_remote_topics)
 
         # add to local from remote topic
         for r_t in add_to_local_topics:
@@ -496,12 +495,12 @@ class ROSduct(object):
         import rosservice
         current_remote_services = [service for service in self.client.get_services() if not service.startswith("/ros")]
         current_local_services = [service for service in rosservice.get_service_list() if not service.startswith("/ros")]
-        print(current_remote_services)
-        print(current_local_services)
+        #print(current_remote_services)
+        #print(current_local_services)
         add_to_local_services = set(current_remote_services) - set(current_local_services)
         add_to_remote_services = set(current_local_services) - set(current_remote_services)
-        print("Add to local services", add_to_local_services)
-        print("Add to remote services", add_to_remote_services)
+        #print("Add to local services", add_to_local_services)
+        #print("Add to remote services", add_to_remote_services)
 
         # add to local from remote service
         for r_s in add_to_local_services:
