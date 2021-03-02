@@ -109,11 +109,27 @@ def from_dict_to_ROS(dict_msg, ros_message_type, srv=False):
     ROS message instance.
     """
     msg_class = get_ROS_class(ros_message_type, srv=srv)
+    #print(msg_class)
     msg_instance = msg_class()
+    #print(msg_instance.__slots__)
+    #print(msg_instance._slot_types)
+    #print(dict_msg.keys())
+    if "data" in dict_msg.keys():
+        import base64
+        dict_msg["data"] = base64.b64decode(dict_msg["data"])
+        print(dict_msg["data"][:10])
+        #dict_msg["data"] = (dict_msg["data"]).encode()
+        
+    if "min_solution_cost" in dict_msg.keys():
+        dict_msg["min_solution_cost"] = 0.0
+    #for message_slot in msg_instance.__slots__:
+    #    print(message_slot, dict_msg[message_slot])
     # Workaround
     if len(dict_msg) == 1:
         dict_msg = [dict_msg]
     fill_message_args(msg_instance, dict_msg)
+    #print("instance: " + str(msg_instance) + str(len(msg_instance.data)))
+    print(str(msg_instance)[:200])
     return msg_instance
 
 

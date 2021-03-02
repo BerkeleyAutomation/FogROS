@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python
 
 import rospy
 from rosduct.rosduct_impl import ROSduct

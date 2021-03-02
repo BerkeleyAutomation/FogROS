@@ -235,17 +235,17 @@ class ROSduct(object):
         # Note: argument MUST be named 'message' as
         # that's the keyword given to pydispatch
         def callback_remote_to_local(message):
-            rospy.logdebug("Remote ROSBridge subscriber from topic " +
+            print("Remote ROSBridge subscriber from topic " +
                            topic_name + ' of type ' +
-                           topic_type + ' got data: ' + str(message) +
+                           topic_type + ' got data: ' + 
                            ' which is republished locally.')
             # Only convert and publish with subscribers
             if rospub.get_num_connections() >= 1:
                 msg = from_dict_to_ROS(message, topic_type)
-                try:
-                    rospub.publish(msg)
-                except:
-                    print("published")
+                #try:
+                rospub.publish(msg)
+                #except Exception as e:
+                #    print("published" + str(e))
         return callback_remote_to_local
 
     def create_callback_from_local_to_remote(self,

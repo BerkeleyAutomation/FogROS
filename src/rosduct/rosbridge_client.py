@@ -446,6 +446,7 @@ class ROSBridgeClient(WebSocketClient):
             message(ws4py.messaging.Message): A message that sent from
                 ROS server.
         """
+        #print(message)
         data = json.loads(message.data)
         if 'topic' in data:
             # Note that the callback argument MUST be named message (damn.)
