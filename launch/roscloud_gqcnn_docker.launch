@@ -3,8 +3,8 @@
   <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />	
     
   <node name="roscloud_docker" pkg="roscloud" type="roscloud_docker.py" output="screen">
-  	<param name="instance_type" value="t2.xlarge"/>
- 	<param name="docker_image" value="keplerc/grasp_image:cpu"/>
+  	<param name="instance_type" value="g4dn.xlarge"/>
+ 	<param name="docker_image" value="keplerc/grasp_image:gpu"/>
   </node>
   
 </launch>

@@ -64,7 +64,7 @@ def aws_create_instance(ec2_resource, ec2_key_name, ec2_security_group_ids, ec2_
     # note that we can start muliple instances at the same time
     #
     instances = ec2_resource.create_instances(
-        ImageId='ami-05829bd3e68bcd415',
+        ImageId='ami-07bbf7d5ad5863aad', # ImageId='ami-05829bd3e68bcd415',
         MinCount=1,
         MaxCount=1,
         InstanceType=ec2_instance_type,
@@ -74,7 +74,7 @@ def aws_create_instance(ec2_resource, ec2_key_name, ec2_security_group_ids, ec2_
             {
                 'DeviceName': '/dev/sda1',
                 'Ebs': {
-                    'VolumeSize': 20,
+                    'VolumeSize': 30,
                     'VolumeType': 'standard'
                 }
             }
@@ -189,7 +189,7 @@ def connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_
 
         # catkin_make all the uploaded packages
         # roslaunch the script on EC2  
-        stdin, stdout, stderr = ssh_client.exec_command('cd ~/catkin_ws/ && source ./devel/setup.bash && catkin_make && roslaunch roscloud to_cloud.launch' , get_pty=True)
+        stdin, stdout, stderr = ssh_client.exec_command('cd ~/catkin_ws/ && source ./devel/setup.bash && catkin_make -DCMAKE_BUILD_TYPE=Release && roslaunch roscloud to_cloud.launch' , get_pty=True)
 
         for line in iter(stdout.readline, ""):
             print("EC2: " + str(time.time()) + " " + CRED + line + CEND, end="")        
@@ -208,7 +208,7 @@ def push_launch(launch_file, ec2_instance_type, env_script):
 
     
 def push_docker(docker_image, ec2_instance_type):
-
+    print("start launching " + str(time.time()))
     docker_str ='''
 sudo apt install -y docker.io
 sudo docker pull ''' + docker_image + '''
