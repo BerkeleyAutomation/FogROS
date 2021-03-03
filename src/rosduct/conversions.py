@@ -121,7 +121,9 @@ def from_dict_to_ROS(dict_msg, ros_message_type, srv=False):
         #dict_msg["data"] = (dict_msg["data"]).encode()
         
     if "min_solution_cost" in dict_msg.keys():
-        dict_msg["min_solution_cost"] = 0.0
+        print("solution cost", str(dict_msg["min_solution_cost"]))
+        
+        #dict_msg["min_solution_cost"] = 0.0
     #for message_slot in msg_instance.__slots__:
     #    print(message_slot, dict_msg[message_slot])
     # Workaround

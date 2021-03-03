@@ -64,7 +64,7 @@ def aws_create_instance(ec2_resource, ec2_key_name, ec2_security_group_ids, ec2_
     # note that we can start muliple instances at the same time
     #
     instances = ec2_resource.create_instances(
-        ImageId='ami-07bbf7d5ad5863aad', # ImageId='ami-05829bd3e68bcd415',
+        ImageId=  'ami-035d68e6a6447bbcf',  #'ami-07bbf7d5ad5863aad', # ImageId='ami-05829bd3e68bcd415',
         MinCount=1,
         MaxCount=1,
         InstanceType=ec2_instance_type,
@@ -116,7 +116,10 @@ def prepare_launch_file(launch_file):
 </launch>
     '''
     with open("/tmp/to_cloud.launch" , "w") as f:
-        f.write(launch_text.replace("</launch>", rosduct_launch_text))
+        if "rosduct" not in launch_text:
+            f.write(launch_text.replace("</launch>", rosduct_launch_text))
+        else:
+            f.write(launch_text)
         
     # find all the ROS packages in the launchscript
     # package need to follow ros naming convention

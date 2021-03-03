@@ -412,8 +412,8 @@ class ROSduct(object):
         current_local_topics = [topic[0] for topic in current_local_topic_with_types]
         add_to_local_topics = set(current_remote_topics) - set(current_local_topics)
         add_to_remote_topics = set(current_local_topics) - set(current_remote_topics)
-        #print("Add to local topics", add_to_local_topics)
-        #print("Add to remote topics", add_to_remote_topics)
+        print("Add to local topics", add_to_local_topics)
+        print("Add to remote topics", add_to_remote_topics)
 
         # add to local from remote topic
         for r_t in add_to_local_topics:
