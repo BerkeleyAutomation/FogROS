@@ -1,8 +1,8 @@
 <launch>
 <node pkg="roscloud" name="rosduct" type="rosduct_main.py" output="screen">
     <rosparam>
-    # ROSbridge websocket server info
-    rosbridge_ip: 54.193.159.104 
+    automatic_topic_scan: False
+    rosbridge_ip: ROSBRIDGE_IP_HOLDER
     rosbridge_port: 9090
     # Topics being published in the robot to expose locally
     remote_topics: [
@@ -14,14 +14,6 @@
     local_topics: [
                        ['/gqcnn/grasp', 'gqcnn_ros/GQCNNGrasp']
                   ]
-    # Services running in the robot to expose locally
-    remote_services: []
-    # Services running locally to expose to the robot
-    local_services: []
-    # Parameters to be sync, they will be polled to stay in sync
-    #parameters: []
-    #parameter_polling_hz: 1
-
     </rosparam>
   </node>
 
