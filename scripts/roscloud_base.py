@@ -119,7 +119,7 @@ def prepare_launch_file(launch_file):
         if "rosduct" not in launch_text:
             f.write(launch_text.replace("</launch>", rosduct_launch_text))
         else:
-            f.write(launch_text)
+            f.write(launch_text.replace("ROSBRIDGE_IP_HOLDER", my_ip))
         
     # find all the ROS packages in the launchscript
     # package need to follow ros naming convention

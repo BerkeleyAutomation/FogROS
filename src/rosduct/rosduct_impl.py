@@ -82,6 +82,11 @@ class ROSduct(object):
         rospy.loginfo("Parameters: " + str(self.parameters))
         self.last_params = {}
 
+        if rospy.get_param("~automatic_topic_scan", "True") == "True":
+            self.automatic_scanning = True
+        else:
+            self.automatic_scanning = False
+
         self.check_if_msgs_are_installed()
 
         self.initialize()
@@ -523,8 +528,9 @@ class ROSduct(object):
         r = rospy.Rate(self.rate_hz)
         while not rospy.is_shutdown():
             self.sync_params()
-            self.sync_topics()
-            self.sync_services()
+            if self.automatic_scanning:
+                self.sync_topics()
+                self.sync_services()
             r.sleep()
 
 
