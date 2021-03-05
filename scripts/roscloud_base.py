@@ -18,7 +18,7 @@ import random
 CRED = '\033[91m'
 CEND = '\033[0m'
 
-aws_region = "us-west-2"
+aws_region = "us-west-1"
 
 def make_zip_file(dir_name, target_path):
     pwd, package_name = os.path.split(dir_name)
@@ -66,7 +66,7 @@ def aws_create_instance(ec2_resource, ec2_key_name, ec2_security_group_ids, ec2_
     # note that we can start muliple instances at the same time
     #
     instances = ec2_resource.create_instances(
-        ImageId= 'ami-0757bbcb3ba382f34', #'ami-0099f9139c84a5007', # ImageId='ami-05829bd3e68bcd415',
+        ImageId= 'ami-0099f9139c84a5007',  # 'ami-0757bbcb3ba382f34', #'ami-0099f9139c84a5007', # ImageId='ami-05829bd3e68bcd415',
         MinCount=1,
         MaxCount=1,
         InstanceType=ec2_instance_type,
