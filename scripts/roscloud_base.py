@@ -18,6 +18,8 @@ import random
 CRED = '\033[91m'
 CEND = '\033[0m'
 
+aws_region = "us-west-2"
+
 def make_zip_file(dir_name, target_path):
     pwd, package_name = os.path.split(dir_name)
     return shutil.make_archive(base_dir = package_name, root_dir = pwd, format = "zip", base_name = target_path)
@@ -64,7 +66,7 @@ def aws_create_instance(ec2_resource, ec2_key_name, ec2_security_group_ids, ec2_
     # note that we can start muliple instances at the same time
     #
     instances = ec2_resource.create_instances(
-        ImageId=  'ami-0099f9139c84a5007', # ImageId='ami-05829bd3e68bcd415',
+        ImageId= 'ami-0757bbcb3ba382f34', #'ami-0099f9139c84a5007', # ImageId='ami-05829bd3e68bcd415',
         MinCount=1,
         MaxCount=1,
         InstanceType=ec2_instance_type,
@@ -143,8 +145,8 @@ def create_ec2_pipeline(ec2_instance_type = "t2.large", image_id = "ami-05829bd3
     rand_int = str(random.randint(10, 1000))
     ec2_key_name = "foo" + rand_int
     ec2_security_group_name = 'SECURITY_GROUP_NAME' + rand_int
-    ec2_resource = boto3.resource('ec2', "us-west-1")
-    ec2 = boto3.client('ec2', "us-west-1")
+    ec2_resource = boto3.resource('ec2', aws_region)
+    ec2 = boto3.client('ec2', aws_region)
     ec2_priv_key = aws_generate_key_pair(ec2, ec2_key_name)
     ec2_security_group_ids = aws_create_security_group(ec2, ec2_security_group_name)
     instance = aws_create_instance(ec2_resource, ec2_key_name, ec2_security_group_ids, ec2_instance_type)
