@@ -95,7 +95,7 @@ def aws_create_instance(ec2_resource, ec2_key_name, ec2_security_group_ids, ec2_
     #print(instance_dict)
     return instance 
 
-def prepare_launch_file(launch_file):
+def prepare_launch_file(launch_file, magic_int):
 
     # 
     # read in the launchfile 
@@ -117,7 +117,7 @@ def prepare_launch_file(launch_file):
     </node>
 </launch>
     '''
-    with open("/tmp/to_cloud.launch" , "w") as f:
+    with open("/tmp/to_cloud" + magic_int + ".launch" , "w") as f:
         if "rosduct" not in launch_text:
             f.write(launch_text.replace("</launch>", rosduct_launch_text))
         else:
@@ -159,7 +159,7 @@ def create_ec2_pipeline(rand_int, ec2_instance_type = "t2.large", image_id = "am
 
 
     
-def connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_script):
+def connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_script, magic_int):
     private_key = paramiko.RSAKey.from_private_key_file("/home/ubuntu/" + ec2_key_name + ".pem")
     ssh_client = paramiko.SSHClient()
     ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -172,7 +172,7 @@ def connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_
 
         # use SCP to upload the launch script
         # TODO: there might be a collision if we run multiple nodes, need to solve it 
-        scp.put("/tmp/to_cloud.launch", "~/catkin_ws/src/roscloud/launch/to_cloud.launch")
+        scp.put("/tmp/to_cloud" + magic_int + ".launch", "~/catkin_ws/src/roscloud/launch/to_cloud.launch")
 
         scp.put(env_script, "~/setup.bash")
 
@@ -205,16 +205,15 @@ def push_launch(launch_file, ec2_instance_type, env_script):
     rand_int = str(random.randint(10, 1000))
     print("start launching " + str(time.time()))
     public_ip, ec2_key_name =create_ec2_pipeline(rand_int, ec2_instance_type)
-    launch_file_dir , launch_file_name = os.path.split(launch_file)
-    zip_paths = prepare_launch_file(launch_file)
-
     if(rospy.get_name() == "/leader"):
         with open("/tmp/leader_info", "w+") as f:
             f.write("{}".format(public_ip))
 
+    launch_file_dir , launch_file_name = os.path.split(launch_file)
+    zip_paths = prepare_launch_file(launch_file, rand_int)
+    time.sleep(60)
+
     leader_ip = ""
-    if not os.path.exists("/tmp/leader_info"):
-        time.sleep(4)
     with open("/tmp/leader_info") as f:
         leader_ip = f.read()
     with open(env_script) as f:
@@ -223,12 +222,12 @@ export ROS_HOSTNAME={}
 export export ROS_MASTER_URI=http://{}:11311
 export ROS_IP={}
         '''.format(leader_ip, leader_ip.strip(), public_ip)
-    with open("/tmp/setup.bash", "w+") as f:
+    env_script = "/tmp/setup" + rand_int + ".bash"
+    with open(env_script, "w+") as f:
         print(env_script_text)
         f.write(env_script_text)
                             
-    time.sleep(60)
-    connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_script)
+    connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_script, rand_int)
 
     
 def push_docker(docker_image, ec2_instance_type):
