@@ -141,8 +141,7 @@ def prepare_launch_file(launch_file):
     return zip_paths 
 
 
-def create_ec2_pipeline(ec2_instance_type = "t2.large", image_id = "ami-05829bd3e68bcd415"):
-    rand_int = str(random.randint(10, 1000))
+def create_ec2_pipeline(rand_int, ec2_instance_type = "t2.large", image_id = "ami-05829bd3e68bcd415"):
     ec2_key_name = "foo" + rand_int
     ec2_security_group_name = 'SECURITY_GROUP_NAME' + rand_int
     ec2_resource = boto3.resource('ec2', aws_region)
@@ -203,16 +202,37 @@ def connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_
 
     
 def push_launch(launch_file, ec2_instance_type, env_script):
+    rand_int = str(random.randint(10, 1000))
     print("start launching " + str(time.time()))
-    public_ip, ec2_key_name =create_ec2_pipeline(ec2_instance_type)
+    public_ip, ec2_key_name =create_ec2_pipeline(rand_int, ec2_instance_type)
     launch_file_dir , launch_file_name = os.path.split(launch_file)
     zip_paths = prepare_launch_file(launch_file)
-    
+
+    if(rospy.get_name() == "/leader"):
+        with open("/tmp/leader_info", "w+") as f:
+            f.write("{}".format(public_ip))
+
+    leader_ip = ""
+    if not os.path.exists("/tmp/leader_info"):
+        time.sleep(4)
+    with open("/tmp/leader_info") as f:
+        leader_ip = f.read()
+    with open(env_script) as f:
+        env_script_text = f.read() + '''
+export ROS_HOSTNAME={}
+export export ROS_MASTER_URI=http://{}:11311
+export ROS_IP={}
+        '''.format(leader_ip, leader_ip.strip(), public_ip)
+    with open("/tmp/setup.bash", "w+") as f:
+        print(env_script_text)
+        f.write(env_script_text)
+                            
     time.sleep(60)
     connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_script)
 
     
 def push_docker(docker_image, ec2_instance_type):
+    rand_int = str(random.randint(10, 1000))
     print("start launching " + str(time.time()))
     docker_str ='''
 sudo apt install -y docker.io
@@ -227,7 +247,7 @@ sudo docker run -d --network host --rm ''' + docker_image
     env_script = "/tmp/docker.bash"
     with open(launch_file, "w") as f:
         f.write(launch_file_str)
-    public_ip, ec2_key_name =create_ec2_pipeline(ec2_instance_type)
+    public_ip, ec2_key_name =create_ec2_pipeline(rand_int, ec2_instance_type)
     launch_file_dir , launch_file_name = os.path.split(launch_file)
     zip_paths = prepare_launch_file(launch_file)
     with open("/tmp/docker.bash", "w") as f:

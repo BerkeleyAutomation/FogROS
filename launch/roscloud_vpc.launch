@@ -1,0 +1,15 @@
+<launch>
+  # start rosbridge websocket server
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />	
+  
+  <node name="leader" pkg="roscloud" type="roscloud_launch.py" output="screen">
+  	<param name="instance_type" value="t2.micro"/>
+   	<param name="launch_file" value="/home/ubuntu/catkin_ws/src/roscloud/launch/talker.launch" />
+  </node>  
+
+  <node name="follower1" pkg="roscloud" type="roscloud_launch.py" output="screen">
+  	<param name="instance_type" value="t2.micro"/>
+   	<param name="launch_file" value="/home/ubuntu/catkin_ws/src/roscloud/launch/talker.launch" />
+  </node>  
+
+</launch>

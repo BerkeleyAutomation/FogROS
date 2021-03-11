@@ -6,7 +6,7 @@ import rospy
 
 if __name__ == "__main__":
     rospy.init_node('roscloud')
-    print(rospy.get_param_names())
+    print(rospy.get_name())
     launch_file = rospy.get_param('~launch_file')
     instance_type = rospy.get_param("~instance_type")
     env_script = rospy.get_param("~env_script", "")
