@@ -9,7 +9,8 @@
 
   <node name="follower1" pkg="roscloud" type="roscloud_launch.py" output="screen">
   	<param name="instance_type" value="t2.micro"/>
-   	<param name="launch_file" value="/home/ubuntu/catkin_ws/src/roscloud/launch/talker.launch" />
-  </node>  
+   	<param name="launch_file" value="/home/ubuntu/catkin_ws/src/roscloud/launch/mpt.launch" />
+  	<param name="env_script" value="/home/ubuntu/catkin_ws/src/roscloud/launch/mpt.bash"/>
+  </node>
 
 </launch>
