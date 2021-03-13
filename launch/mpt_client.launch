@@ -1,0 +1,3 @@
+<launch>
+    <node name="client_node" pkg="mpt_ros" type="client" output="screen"/> 
+</launch>

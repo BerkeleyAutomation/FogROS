@@ -95,7 +95,7 @@ def aws_create_instance(ec2_resource, ec2_key_name, ec2_security_group_ids, ec2_
     #print(instance_dict)
     return instance 
 
-def prepare_launch_file(launch_file, magic_int):
+def prepare_launch_file(launch_file, magic_int, modify_launch=True):
 
     # 
     # read in the launchfile 
@@ -118,7 +118,7 @@ def prepare_launch_file(launch_file, magic_int):
 </launch>
     '''
     with open("/tmp/to_cloud" + magic_int + ".launch" , "w") as f:
-        if "rosduct" not in launch_text:
+        if ("rosduct" not in launch_text) and modify_launch :
             f.write(launch_text.replace("</launch>", rosduct_launch_text))
         else:
             f.write(launch_text.replace("ROSBRIDGE_IP_HOLDER", my_ip))
@@ -159,7 +159,7 @@ def create_ec2_pipeline(rand_int, ec2_instance_type = "t2.large", image_id = "am
 
 
     
-def connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_script, magic_int):
+def connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_script, magic_int, env_command= ""):
     private_key = paramiko.RSAKey.from_private_key_file("/home/ubuntu/" + ec2_key_name + ".pem")
     ssh_client = paramiko.SSHClient()
     ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -181,19 +181,34 @@ def connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_
         stdin, stdout, stderr = ssh_client.exec_command("cd ~/catkin_ws/src && for i in *.zip; do unzip -o \"$i\" -d . ; done " , get_pty=True)
 
         for line in iter(stdout.readline, ""):
-            print(CRED + line + CEND, end="")
-
+            continue
+            #print(CRED + line + CEND, end="")
         
         # execute setup script
         stdin, stdout, stderr = ssh_client.exec_command("chmod +x ~/setup.bash && ~/setup.bash" , get_pty=True)
 
         for line in iter(stdout.readline, ""):
-            print(CRED + line + CEND, end="")
+            continue
+            #print(CRED + line + CEND, end="")
 
 
         # catkin_make all the uploaded packages
         # roslaunch the script on EC2  
-        stdin, stdout, stderr = ssh_client.exec_command('cd ~/catkin_ws/ && source ./devel/setup.bash && catkin_make -DCMAKE_BUILD_TYPE=Release && roslaunch roscloud to_cloud.launch' , get_pty=True)
+        stdin, stdout, stderr = ssh_client.exec_command('cd ~/catkin_ws/ && source ./devel/setup.bash && catkin_make -DCMAKE_BUILD_TYPE=Release' , get_pty=True)
+
+        for line in iter(stdout.readline, ""):
+            print("EC2: " + str(time.time()) + " " + CRED + line + CEND, end="")        
+
+
+        stdin, stdout, stderr = ssh_client.exec_command(env_command + " echo $ROS_HOSTNAME && echo $ROS_MASTER_URI", get_pty=True)
+
+        for line in iter(stdout.readline, ""):
+            print("==============" + line, end="")        
+        print("=================")
+        print(stderr)
+        print(env_command + " roslaunch roscloud to_cloud.launch")
+        
+        stdin, stdout, stderr = ssh_client.exec_command("source ~/catkin_ws/devel/setup.bash && " + env_command + " roslaunch roscloud to_cloud.launch", get_pty=True)
 
         for line in iter(stdout.readline, ""):
             print("EC2: " + str(time.time()) + " " + CRED + line + CEND, end="")        
@@ -208,28 +223,34 @@ def push_launch(launch_file, ec2_instance_type, env_script):
     if(rospy.get_name() == "/leader"):
         with open("/tmp/leader_info", "w+") as f:
             f.write("{}".format(public_ip))
+    else:
+        time.sleep(40)
 
     launch_file_dir , launch_file_name = os.path.split(launch_file)
-    zip_paths = prepare_launch_file(launch_file, rand_int)
+    zip_paths = prepare_launch_file(launch_file, rand_int, False)
     time.sleep(60)
 
     leader_ip = ""
     with open("/tmp/leader_info") as f:
         leader_ip = f.read()
     with open(env_script) as f:
-        env_script_text = f.read() + '''
+        env_command = '''
 export ROS_HOSTNAME={}
-export export ROS_MASTER_URI=http://{}:11311
-export ROS_IP={}
-        '''.format(leader_ip, leader_ip.strip(), public_ip)
+export ROS_MASTER_URI=http://{}:11311
+        '''.format(public_ip, leader_ip.strip())
+        env_script_text = f.read() + env_command
     env_script = "/tmp/setup" + rand_int + ".bash"
     with open(env_script, "w+") as f:
         print(env_script_text)
         f.write(env_script_text)
-                            
-    connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_script, rand_int)
 
-    
+    if public_ip == leader_ip:
+        print("public == leader ===============")
+        connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_script, rand_int)
+    else:
+        print("public != leader===========")
+        connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_script, rand_int, "export ROS_HOSTNAME={} && export ROS_MASTER_URI=http://{}:11311 &&".format(public_ip, leader_ip.strip()))
+        
 def push_docker(docker_image, ec2_instance_type):
     rand_int = str(random.randint(10, 1000))
     print("start launching " + str(time.time()))
