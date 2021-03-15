@@ -224,7 +224,7 @@ def push_launch(launch_file, ec2_instance_type, env_script):
             f.write("{}".format(public_ip))
     else:
         #TODO: depends on the task
-        time.sleep(400)
+        time.sleep(60)
 
     launch_file_dir , launch_file_name = os.path.split(launch_file)
     zip_paths = prepare_launch_file(launch_file, rand_int, False)
