@@ -188,8 +188,7 @@ def connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_
         stdin, stdout, stderr = ssh_client.exec_command("chmod +x ~/setup.bash && ~/setup.bash" , get_pty=True)
 
         for line in iter(stdout.readline, ""):
-            continue
-            #print(CRED + line + CEND, end="")
+            print(CRED + line + CEND, end="")
 
 
         # catkin_make all the uploaded packages
@@ -224,7 +223,8 @@ def push_launch(launch_file, ec2_instance_type, env_script):
         with open("/tmp/leader_info", "w+") as f:
             f.write("{}".format(public_ip))
     else:
-        time.sleep(40)
+        #TODO: depends on the task
+        time.sleep(400)
 
     launch_file_dir , launch_file_name = os.path.split(launch_file)
     zip_paths = prepare_launch_file(launch_file, rand_int, False)
@@ -234,11 +234,16 @@ def push_launch(launch_file, ec2_instance_type, env_script):
     with open("/tmp/leader_info") as f:
         leader_ip = f.read()
     with open(env_script) as f:
+        env_script_txt = f.read()
         env_command = '''
 export ROS_HOSTNAME={}
 export ROS_MASTER_URI=http://{}:11311
-        '''.format(public_ip, leader_ip.strip())
-        env_script_text = f.read() + env_command
+'''.format(public_ip, leader_ip.strip())
+        env_script_text = env_command + env_script_txt
+        if (public_ip != leader_ip):
+            print("need to modify the ip env")
+            env_script_text = env_script_text.replace("docker run", "docker run -e ROS_HOSTNAME={}  -e ROS_MASTER_URI=http://{}:11311  ".format(public_ip, leader_ip.strip()))
+            
     env_script = "/tmp/setup" + rand_int + ".bash"
     with open(env_script, "w+") as f:
         print(env_script_text)
