@@ -1,8 +1,8 @@
-# RosCloud 
+# FogROS 
 
 
 
-## What is RosCloud 
+## What is FogROS 
 
 RosCloud enables ROS application developers to easily offload their ROS applications to Amazon EC2 servers. After the initial setup(AWS related), developers simply start an offload request node and the projects will automatically run on the remote server. Example of the initiating script is ```launch/roscloud*.launch```.
 
