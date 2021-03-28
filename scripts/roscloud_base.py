@@ -212,10 +212,8 @@ def connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_
         for line in iter(stdout.readline, ""):
             print("EC2: " + str(time.time()) + " " + CRED + line + CEND, end="")        
 
-
-
     
-def push_launch(launch_file, ec2_instance_type, env_script):
+def push_vpc(launch_file, ec2_instance_type, env_script):
     rand_int = str(random.randint(10, 1000))
     print("start launching " + str(time.time()))
     public_ip, ec2_key_name =create_ec2_pipeline(rand_int, ec2_instance_type)
@@ -228,7 +226,7 @@ def push_launch(launch_file, ec2_instance_type, env_script):
 
     launch_file_dir , launch_file_name = os.path.split(launch_file)
     zip_paths = prepare_launch_file(launch_file, rand_int, False)
-    time.sleep(60)
+    time.sleep(240)
 
     leader_ip = ""
     with open("/tmp/leader_info") as f:
@@ -274,10 +272,20 @@ sudo docker run -d --network host --rm ''' + docker_image
         f.write(launch_file_str)
     public_ip, ec2_key_name =create_ec2_pipeline(rand_int, ec2_instance_type)
     launch_file_dir , launch_file_name = os.path.split(launch_file)
-    zip_paths = prepare_launch_file(launch_file)
+    zip_paths = prepare_launch_file(launch_file, rand_int)
     with open("/tmp/docker.bash", "w") as f:
         f.write(docker_str)
     
     time.sleep(60)
-    connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_script)
+    connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_script, rand_int)
 
+    
+def push_launch(launch_file, ec2_instance_type, env_script):
+    rand_int = str(random.randint(10, 1000))
+    print("start launching " + str(time.time()))
+    public_ip, ec2_key_name =create_ec2_pipeline(rand_int, ec2_instance_type)
+    launch_file_dir , launch_file_name = os.path.split(launch_file)
+    zip_paths = prepare_launch_file(launch_file, rand_int)
+    
+    time.sleep(60)
+    connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_script, rand_int)
