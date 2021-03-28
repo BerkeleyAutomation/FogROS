@@ -4,7 +4,7 @@
     
   <node name="roscloud_docker" pkg="roscloud" type="roscloud_docker.py" output="screen">
   	<param name="instance_type" value="g4dn.xlarge"/>
- 	<param name="docker_image" value="keplerc/grasp_image:gpu"/>
+ 	<param name="docker_image" value="keplerc/grasp_image:gpu_dk"/>
   </node>
   
 </launch>

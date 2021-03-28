@@ -260,7 +260,7 @@ def push_docker(docker_image, ec2_instance_type):
     docker_str ='''
 sudo apt install -y docker.io
 sudo docker pull ''' + docker_image + '''
-sudo docker run -d --network host --rm ''' + docker_image
+sudo docker run -d --gpus all --network host --rm ''' + docker_image
 
     launch_file_str = '''
 <launch>
