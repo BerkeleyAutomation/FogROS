@@ -10,7 +10,7 @@ FogROS is a framework that allows existing ROS automation applications to gain a
 
 The paper presents a user-friendly framework that allows computationally intensive parts of robotics programs (e.g., GPU, multi-core CPU, FPGA, TPU) to be run in the cloud; in experiments, common robotics algorithms (motion planning, grasp planning, VSLAM) deployed to the cloud via FogROS showed up to 31.5x performance improvement.The authors aim to make cloud-based deployments through FogROS transparent to researchers and roboticists--FogROS takes care of the details of setting up cloud computers, securing communication, and running programs in the cloud, allowing roboticists to benefit for the performance gain, allowing researchers to experiment with different deployments or focus on their application.With FogROS, researchers can deploy their software so that other researchers can make use of it with minimal effort and without concern for hardware compatibility--potentially allowing for increased cross-pollination of research ideas and more productive labs.
 
-
+![Alt Text](https://github.com/BerkeleyAutomation/FogROS/raw/main/doc/FogROS.gif)
 
 ## Install
 
