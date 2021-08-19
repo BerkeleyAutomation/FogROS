@@ -14,6 +14,8 @@ FogROS takes care of the details of setting up cloud computers, securing communi
 
 ![Alt Text](https://github.com/BerkeleyAutomation/FogROS/raw/main/doc/FogROS.gif)
 
+This project will be published in [IEEE International Conference on Automation Science and Engineering (CASE) 2021](https://case2021.sciencesconf.org/). The video can be found on [Youtube](https://www.youtube.com/watch?v=lSZw_Fkpnm0&t=2s), and the manual script can be found 
+
 ## Install
 
 #### Step 0: Set up ROS
@@ -23,7 +25,7 @@ Set up ROS environment and clone this repo to catkin workspace. ```ami-0d7962a5f
 #### Step 1:  Set up the repo's environments
 
 1. you need to run ```aws configure``` to configure the AWS API keys. 
-2. ```launch/roscloud*.launch``` has plenty of options. You may specify a docker image, or just several ROS nodes 
+2. ```launch/roscloud*.launch``` has plenty of options. You may specify a docker image, or just several ROS nodes. The code for the demos can be found in [Demo Repo](https://github.com/BerkeleyAutomation/fogros-demos). 
 
 #### Step2: Run it 
 Simply run 
