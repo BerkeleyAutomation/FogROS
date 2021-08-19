@@ -42,12 +42,12 @@ on your robot or local machine.
 
 
 
-### Release Plan 
+## Release Plan 
 
 Currently, FogROS is still a research prototype. It is going through code and documentation revisions. We are planning to have official release by mid-September. 
 
 
 
-### Contact Us 
+## Contact Us 
 
 If there were any concerns, please post as Github issue, or send an email to Eric Chen by kych@berkeley.edu. 
