@@ -12,9 +12,9 @@ FogROS presents a user-friendly framework that allows computationally intensive 
 
 FogROS takes care of the details of setting up cloud computers, securing communication, and running programs in the cloud, allowing roboticists to benefit for the performance gain, allowing researchers to experiment with different deployments or focus on their application.With FogROS, researchers can deploy their software so that other researchers can make use of it with minimal effort and without concern for hardware compatibility--potentially allowing for increased cross-pollination of research ideas and more productive labs.
 
-![Alt Text](https://github.com/BerkeleyAutomation/FogROS/raw/main/doc/FogROS.gif)
+![architecture diagram depicting 4 nodes, one of which is in the cloud with FogROS](https://github.com/BerkeleyAutomation/FogROS/raw/main/docs/FogROS.gif)
 
-This project will be published in [IEEE International Conference on Automation Science and Engineering (CASE) 2021](https://case2021.sciencesconf.org/). The video can be found on [Youtube](https://www.youtube.com/watch?v=lSZw_Fkpnm0&t=2s), and the paper can be found [Here](https://github.com/BerkeleyAutomation/FogROS/blob/main/doc/FogROS_CASE2021_Camera%20Ready.pdf). 
+This project will be published in [IEEE International Conference on Automation Science and Engineering (CASE) 2021](https://case2021.sciencesconf.org/). The video can be found on [Youtube](https://www.youtube.com/watch?v=lSZw_Fkpnm0&t=2s), and the paper can be found [Here](https://github.com/BerkeleyAutomation/FogROS/blob/main/docs/FogROS_CASE2021_Camera%20Ready.pdf). 
 
 ## Install
 
