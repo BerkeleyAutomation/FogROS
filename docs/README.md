@@ -1,3 +1,5 @@
+# FogROS: An Adaptive Framework for Automating Fog Robotics Deployment
+
 FogROS is a framework that allows existing ROS automation applications to gain access to additional computing resources from commercial cloud-based services. This framework is built on the [Robot Operating System (ROS)](https://www.ros.org/), the de-facto standard for creating robot automation applications and components. With minimal porting effort, FogROS allows researchers to deploy components of their software to the cloud with high transparency.
 
 FogROS presents a user-friendly framework that allows computationally intensive parts of robotics programs (e.g., GPU, multi-core CPU, FPGA, TPU) to be run in the cloud; in experiments, common robotics algorithms (motion planning, grasp planning, VSLAM) deployed to the cloud via FogROS showed up to 31.5x performance improvement.The authors aim to make cloud-based deployments through FogROS transparent to researchers and roboticists. 
