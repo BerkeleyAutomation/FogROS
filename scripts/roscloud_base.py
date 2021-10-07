@@ -66,7 +66,7 @@ def aws_create_instance(ec2_resource, ec2_key_name, ec2_security_group_ids, ec2_
     # note that we can start muliple instances at the same time
     #
     instances = ec2_resource.create_instances(
-        ImageId= 'ami-07c7972b9cfea4647', # 'ami-0d7962a5f43faec05', #'ami-0099f9139c84a5007',  # 'ami-0757bbcb3ba382f34', #'ami-0099f9139c84a5007', # ImageId='ami-05829bd3e68bcd415',
+        ImageId= 'ami-0d255df33d23c5a9d',
         MinCount=1,
         MaxCount=1,
         InstanceType=ec2_instance_type,
