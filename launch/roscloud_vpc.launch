@@ -1,16 +1,16 @@
 <launch>
   # start rosbridge websocket server
   
-  <node name="leader" pkg="roscloud" type="roscloud_vpc.py" output="screen">
+  <node name="leader" pkg="FogROS" type="roscloud_vpc.py" output="screen">
   	<param name="instance_type" value="t2.xlarge"/>
-   	<param name="launch_file" value="/home/ubuntu/catkin_ws/src/roscloud/launch/mpt_client.launch" />
-  	<param name="env_script" value="/home/ubuntu/catkin_ws/src/roscloud/launch/mpt.bash"/>
+   	<param name="launch_file" value="/home/ubuntu/catkin_ws/src/FogROS/launch/mpt_client.launch" />
+  	<param name="env_script" value="/home/ubuntu/catkin_ws/src/FogROS/launch/mpt.bash"/>
   </node>
 
-  <node name="follower1" pkg="roscloud" type="roscloud_vpc.py" output="screen">
+  <node name="follower1" pkg="FogROS" type="roscloud_vpc.py" output="screen">
   	<param name="instance_type" value="c5.24xlarge"/>
-   	<param name="launch_file" value="/home/ubuntu/catkin_ws/src/roscloud/launch/mpt.launch" />
-  	<param name="env_script" value="/home/ubuntu/catkin_ws/src/roscloud/launch/mpt.bash"/>
+   	<param name="launch_file" value="/home/ubuntu/catkin_ws/src/FogROS/launch/mpt.launch" />
+  	<param name="env_script" value="/home/ubuntu/catkin_ws/src/FogROS/launch/mpt.bash"/>
   </node>
 
 </launch>

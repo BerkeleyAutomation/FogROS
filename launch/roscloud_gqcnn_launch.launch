@@ -2,10 +2,10 @@
   # start rosbridge websocket server
   <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />	
   
-  <node name="roscloud_node1" pkg="roscloud" type="roscloud_launch.py" output="screen">
+  <node name="roscloud_node1" pkg="FogROS" type="roscloud_launch.py" output="screen">
   	<param name="instance_type" value="g4dn.xlarge"/>
-   	<param name="launch_file" value="/home/ubuntu/catkin_ws/src/roscloud/launch/gqcnn.launch" />
-  	<param name="env_script" value="/home/ubuntu/catkin_ws/src/roscloud/launch/gqcnn.bash"/>
+   	<param name="launch_file" value="/home/ubuntu/catkin_ws/src/FogROS/launch/gqcnn.launch" />
+  	<param name="env_script" value="/home/ubuntu/catkin_ws/src/FogROS/launch/gqcnn.bash"/>
   </node>
   
 </launch>

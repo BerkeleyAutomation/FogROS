@@ -2,7 +2,7 @@
   # start rosbridge websocket server
   <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />	
     
-  <node name="roscloud_docker" pkg="roscloud" type="roscloud_docker.py" output="screen">
+  <node name="roscloud_docker" pkg="FogROS" type="roscloud_docker.py" output="screen">
   	<param name="instance_type" value="g4dn.xlarge"/>
  	<param name="docker_image" value="keplerc/grasp_image:gpu_dk"/>
   </node>

@@ -2,9 +2,9 @@
   # start rosbridge websocket server
   <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />	
   
-  <node name="roscloud_node_talker" pkg="roscloud" type="roscloud_launch.py" output="screen">
+  <node name="roscloud_node_talker" pkg="FogROS" type="roscloud_launch.py" output="screen">
   	<param name="instance_type" value="t2.micro"/>
-   	<param name="launch_file" value="/home/ubuntu/catkin_ws/src/roscloud/launch/talker.launch" />
+   	<param name="launch_file" value="/home/ubuntu/catkin_ws/src/FogROS/launch/talker.launch" />
   </node>  
 
 </launch>

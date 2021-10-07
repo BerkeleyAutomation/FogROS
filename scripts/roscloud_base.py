@@ -66,7 +66,7 @@ def aws_create_instance(ec2_resource, ec2_key_name, ec2_security_group_ids, ec2_
     # note that we can start muliple instances at the same time
     #
     instances = ec2_resource.create_instances(
-        ImageId= 'ami-0d7962a5f43faec05', #'ami-0099f9139c84a5007',  # 'ami-0757bbcb3ba382f34', #'ami-0099f9139c84a5007', # ImageId='ami-05829bd3e68bcd415',
+        ImageId= 'ami-07c7972b9cfea4647', # 'ami-0d7962a5f43faec05', #'ami-0099f9139c84a5007',  # 'ami-0757bbcb3ba382f34', #'ami-0099f9139c84a5007', # ImageId='ami-05829bd3e68bcd415',
         MinCount=1,
         MaxCount=1,
         InstanceType=ec2_instance_type,
@@ -109,7 +109,7 @@ def prepare_launch_file(launch_file, magic_int, modify_launch=True):
     print("robot public address is ", my_ip)
 
     rosduct_launch_text = '''
-    <node pkg="roscloud" name="rosduct" type="rosduct_main.py" output="screen">
+    <node pkg="FogROS" name="rosduct" type="rosduct_main.py" output="screen">
     <rosparam>
         rosbridge_ip: ''' + my_ip + '''
         rosbridge_port: 9090
@@ -130,7 +130,7 @@ def prepare_launch_file(launch_file, magic_int, modify_launch=True):
     # currently we assume all the packages can be catkin_make 
     rospack = rospkg.RosPack()
     packages = set(re.findall(r"pkg=\"[a-z_]*\"" ,launch_text))
-    packages.add("pkg=\"roscloud\"")
+    packages.add("pkg=\"FogROS\"")
     print(packages)
     zip_paths = []
     for package in packages:
@@ -172,7 +172,7 @@ def connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_
 
         # use SCP to upload the launch script
         # TODO: there might be a collision if we run multiple nodes, need to solve it 
-        scp.put("/tmp/to_cloud" + magic_int + ".launch", "~/catkin_ws/src/roscloud/launch/to_cloud.launch")
+        scp.put("/tmp/to_cloud" + magic_int + ".launch", "~/catkin_ws/src/FogROS/launch/to_cloud.launch")
 
         scp.put(env_script, "~/setup.bash")
 
@@ -205,9 +205,9 @@ def connect_and_launch(ec2_key_name, zip_paths, public_ip, launch_file_dir, env_
             print("==============" + line, end="")        
         print("=================")
         print(stderr)
-        print(env_command + " roslaunch roscloud to_cloud.launch")
+        print(env_command + " roslaunch FogROS to_cloud.launch")
         
-        stdin, stdout, stderr = ssh_client.exec_command("source ~/catkin_ws/devel/setup.bash && " + env_command + " roslaunch roscloud to_cloud.launch", get_pty=True)
+        stdin, stdout, stderr = ssh_client.exec_command("source ~/catkin_ws/devel/setup.bash && " + env_command + " roslaunch FogROS to_cloud.launch", get_pty=True)
 
         for line in iter(stdout.readline, ""):
             print("EC2: " + str(time.time()) + " " + CRED + line + CEND, end="")        
