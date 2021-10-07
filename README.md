@@ -19,7 +19,7 @@ This project will be published in [IEEE International Conference on Automation S
 ## Install
 
 #### Step 0: Set up ROS
-Set up ROS environment and clone this repo to catkin workspace. ```ami-0d7962a5f43faec05``` in ```US-west-1``` is a good starting point if you don't have a working ROS environment. 
+Set up ROS environment and clone this repo to catkin workspace. ```ami-0d255df33d23c5a9d``` in ```US-west-1``` is a good starting point if you don't have a working ROS environment. 
 
 
 #### Step 1:  Set up the repo's environments
@@ -31,7 +31,7 @@ Set up ROS environment and clone this repo to catkin workspace. ```ami-0d7962a5f
 Simply run 
 
 ````
-roslaunch fogros roscloud_talker.launch 
+roslaunch FogROS roscloud_talker.launch 
 ````
 
 for basic pubisher-subscriber example. The EC2 instance will be automatically created, and you will verify the code is working by running 
