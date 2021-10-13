@@ -50,4 +50,4 @@ Currently, FogROS is still a research prototype. It is going through code and do
 
 ## Contact Us 
 
-If there were any concerns, please post as Github issue, or send an email to Eric Chen by kych@berkeley.edu. 
+If there were any concerns/bugs, please post as Github issue. 
