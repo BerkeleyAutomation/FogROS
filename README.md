@@ -38,7 +38,7 @@ for basic pubisher-subscriber example. The EC2 instance will be automatically cr
 ```
 rostopic list
 ```
-on your robot or local machine. 
+on your robot or local machine. The step-by-step tutorial can be found in our [Wiki](https://github.com/BerkeleyAutomation/FogROS/wiki/Running-FogROS-Examples)
 
 
 
