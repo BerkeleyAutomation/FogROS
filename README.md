@@ -1,5 +1,4 @@
 Note that this repository is for FogROS v1, which has been deprecated.
-
 We are moving all of our development efforts to [FogROS2](https://github.com/berkeleyAutomation/FogROS2) which is based on ROS2 since ROS1 is being discontinued soon. 
 =
 
